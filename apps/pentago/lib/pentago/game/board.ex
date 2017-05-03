@@ -1,5 +1,4 @@
 defmodule Pentago.Game.Board do
-  @rows 6
   @size 36
 
   def new do
@@ -11,7 +10,21 @@ defmodule Pentago.Game.Board do
     rotate(new_board, sub_board, rotation)
   end
 
-  # put_elem/3 optimization
+  def available_moves(board, color), do: available_moves(board, [], color, 0)
+  def available_moves(_, moves, _, @size), do: moves
+  def available_moves(board, moves, color, pos) when elem(board, pos) == :empty do
+    new_moves =
+      [{pos, color, 0, :clockwise} | [{pos, color, 0, :counter_clockwise} |
+      [{pos, color, 1, :clockwise} | [{pos, color, 1, :counter_clockwise} |
+      [{pos, color, 2, :clockwise} | [{pos, color, 2, :counter_clockwise} |
+      [{pos, color, 3, :clockwise} | [{pos, color, 3, :counter_clockwise} |
+      moves]]]]]]]]
+
+      available_moves(board, new_moves, color, pos + 1)
+  end
+  def available_moves(board, moves, color, pos), do: available_moves(board, moves, color, pos + 1)
+
+  # in place tuple update - put_elem/3 optimization
   # http://erlang.org/doc/efficiency_guide/commoncaveats.html#id61742
   defp rotate(board, 0, :clockwise) do
     a = elem(board, 0)
