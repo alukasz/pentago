@@ -2,7 +2,7 @@ defmodule Pentago.Web.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", Pentago.Web.RoomChannel
+  channel "game", Pentago.Web.GameChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

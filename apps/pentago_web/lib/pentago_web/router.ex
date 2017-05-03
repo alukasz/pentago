@@ -17,6 +17,8 @@ defmodule Pentago.Web.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+
+    get "/game", GameController, :index
   end
 
   # Other scopes may use custom stacks.
