@@ -38,8 +38,8 @@ defmodule Pentago.Game.Board do
 
     t = put_elem(board, 14, c)
     t = put_elem(t, 13, e)
-    t = put_elem(t, 8, b)
-    t = put_elem(t, 7, h)
+    t = put_elem(t, 12, b)
+    t = put_elem(t, 8, h)
     t = put_elem(t, 6, g)
     t = put_elem(t, 2, a)
     t = put_elem(t, 1, d)

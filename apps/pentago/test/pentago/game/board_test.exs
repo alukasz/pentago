@@ -23,6 +23,7 @@ defmodule Pentago.Game.BoardTest do
         :black, :white, :empty, :black, :white, :empty,
         :white, :empty, :black, :white, :empty, :black,
         :empty, :black, :white, :empty, :black, :white,
+
         :black, :white, :empty, :black, :white, :empty,
         :white, :empty, :black, :white, :empty, :black,
         :empty, :black, :white, :empty, :black, :white
@@ -116,6 +117,12 @@ defmodule Pentago.Game.BoardTest do
 
       new_board = Board.move(board, move)
 
+      assert elem(new_board, 21) == :empty
+      assert elem(new_board, 22) == :white
+      assert elem(new_board, 23) == :black
+      assert elem(new_board, 27) == :black
+      assert elem(new_board, 28) == :empty
+      assert elem(new_board, 29) == :white
       assert elem(new_board, 33) == :white
       assert elem(new_board, 34) == :black
       assert elem(new_board, 35) == :empty
@@ -126,6 +133,12 @@ defmodule Pentago.Game.BoardTest do
 
       new_board = Board.move(board, move)
 
+      assert elem(new_board, 21) == :empty
+      assert elem(new_board, 22) == :black
+      assert elem(new_board, 23) == :white
+      assert elem(new_board, 27) == :white
+      assert elem(new_board, 28) == :empty
+      assert elem(new_board, 29) == :black
       assert elem(new_board, 33) == :black
       assert elem(new_board, 34) == :white
       assert elem(new_board, 35) == :empty

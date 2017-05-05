@@ -15,7 +15,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :pentago_web, Pentago.Web.Endpoint,
   on_init: {Pentago.Web.Endpoint, :load_from_system_env, []},
-  url: [host: "example.com", port: 80],
+  url: [host: "localhost", port: 4000],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
