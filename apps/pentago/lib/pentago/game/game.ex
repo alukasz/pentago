@@ -1,22 +1,26 @@
 defmodule Pentago.Game do
   use GenServer
-  alias Pentago.Game.Board
   alias Pentago.Game.FastBoard
-  alias Pentago.Algorithm.Random
-  alias Pentago.Algorithm.MiniMax
-  alias Pentago.Evaluator.Draw
-  alias Pentago.Evaluator.Win
 
   @name __MODULE__
+  @minimax 0
+  @alphabeta 1
+  @black 0
+  @white 1
+  @empty 2
 
-  def start_link(player1, player2) do
-    GenServer.start_link(@name, {player1, player2}, name: @name)
+  def start_link(player1, player2, depth) do
+    GenServer.start_link(@name, {player1, player2, depth}, name: @name)
   end
 
-  def init({player1, player2}) do
-    board = Tuple.duplicate(2, 36)
+  def close do
+    GenServer.stop(@name, :shutdown)
+  end
 
-    {:ok, %{board: board, turn: 0, moves: [], player1: player1, player2: player2}}
+  def init({player1, player2, depth}) do
+    board = Tuple.duplicate(@empty, 36)
+
+    {:ok, %{board: board, turn: 0, moves: [], player1: player1, player2: player2, depth: depth}}
   end
 
   def make_move(move) do
@@ -24,37 +28,36 @@ defmodule Pentago.Game do
   end
 
   def handle_call({:make_move, %{player: :human} = move}, _from, state) do
-    color = case move.color do
-              :black -> 0
-              :white -> 1
-            end
-
-    result = FastBoard.move(state.board, move.pos, color, move.sub_board, move.rotation)
+    result = FastBoard.move(state.board, move.pos, move.color, move.sub_board, move.rotation)
 
     result(state, result)
   end
 
   def handle_call({:make_move, %{player: :minimax} = move}, _from, state) do
-    depth = 2
-    color = case move.color do
-              :black -> 0
-              :white -> 1
-            end
-    result = FastBoard.make_move(state.board, 0, color, depth, state.turn)
+    result = FastBoard.make_move(state.board, @minimax, move.color, state.depth, state.turn)
 
     result(state, result)
   end
 
-  defp result(state, {new_board, pos, color, sub_board, rotation, winner, leafs}) do
+  def handle_call({:make_move, %{player: :alphabeta} = move}, _from, state) do
+    result = FastBoard.make_move(state.board, @alphabeta, move.color, state.depth, state.turn)
+
+    result(state, result)
+  end
+
+  defp result(state, {new_board, pos, color, sub_board, rotation, winner, time, leafs}) do
     next_color = opposite_color(color)
     move = %{pos: pos, color: color, sub_board: sub_board, rotation: rotation}
 
     reply = %{
-      board: format_board(new_board),
+      board: Tuple.to_list(new_board),
       move: move,
       color: next_color,
       player: player(state, next_color),
-      winner: winner(winner)
+      winner: winner,
+      turn: state.turn + 1,
+      time: time,
+      leafs: leafs
     }
     new_state = %{
       state |
@@ -66,35 +69,9 @@ defmodule Pentago.Game do
     {:reply, reply, new_state}
   end
 
-  defp format_board(board) do
-    board
-    |> Tuple.to_list
-    |> Enum.map(fn color ->
-      case color do
-        0 -> "black"
-        1 -> "white"
-        2 -> "empty"
-      end
-    end)
-  end
+  defp opposite_color(@black), do: @white
+  defp opposite_color(@white), do: @black
 
-  defp turn_color(turn) do
-    case rem(turn, 2) do
-      0 -> "0"
-      1 -> "1"
-    end
-  end
-
-  defp winner(0), do: "black"
-  defp winner(1), do: "white"
-  defp winner(2), do: "empty"
-
-  defp opposite_color(0), do: "white"
-  defp opposite_color(1), do: "black"
-
-  defp player(state, 0), do: state.player1
-  defp player(state, 1), do: state.player2
-
-  defp player(state, "black"), do: state.player1
-  defp player(state, "white"), do: state.player2
+  defp player(state, @black), do: state.player1
+  defp player(state, @white), do: state.player2
 end

@@ -10,8 +10,12 @@
       </div>
 
       <div v-else>
-        <div class="current-player">Current player: {{ current_player }} </div>
+        <div class="current-player">Current player: <strong>{{ current_player }}</strong> </div>
         <div :class="currentColor"></div>
+        <span class="pull-right">
+          leafs: {{ leafs }}<br>
+          time: {{ time }} s.<br>
+        </span>
       </div>
 
       <div id="board">
@@ -24,21 +28,24 @@
           </template>
         </div>
 
-        <button class="rotate rotate-0-c" @click="makeMove(0, 'clockwise')"></button>
-        <button class="rotate rotate-0-cc" @click="makeMove(0, 'counter_clockwise')"></button>
-        <button class="rotate rotate-1-c" @click="makeMove(1, 'clockwise')"></button>
-        <button class="rotate rotate-1-cc" @click="makeMove(1, 'counter_clockwise')"></button>
-        <button class="rotate rotate-2-c" @click="makeMove(2, 'clockwise')"></button>
-        <button class="rotate rotate-2-cc" @click="makeMove(1, 'counter_clockwise')"></button>
-        <button class="rotate rotate-3-c" @click="makeMove(3, 'clockwise')"></button>
-        <button class="rotate rotate-3-cc" @click="makeMove(1, 'counter_clockwise')"></button>
+        <button class="rotate rotate-0-c" :disabled="disableRotate" @click="makeMove(0, 0)"></button>
+        <button class="rotate rotate-0-cc" :disabled="disableRotate" @click="makeMove(0, 1)"></button>
+        <button class="rotate rotate-1-c" :disabled="disableRotate" @click="makeMove(1, 0)"></button>
+        <button class="rotate rotate-1-cc" :disabled="disableRotate" @click="makeMove(1, 1)"></button>
+        <button class="rotate rotate-2-c" :disabled="disableRotate" @click="makeMove(2, 0)"></button>
+        <button class="rotate rotate-2-cc" :disabled="disableRotate" @click="makeMove(2, 1)"></button>
+        <button class="rotate rotate-3-c" :disabled="disableRotate" @click="makeMove(3, 0)"></button>
+        <button class="rotate rotate-3-cc" :disabled="disableRotate" @click="makeMove(3, 1)"></button>
       </div>
 
       <template v-for="move in moves">
         <div>
-          <div :class="moveClass(move)"></div>
+          <div class="current-player">{{ move.turn }}.</div>
+          <div :class="moveClass(move.move)"></div>
           <div class="current-player">
-            {{ row(move) }}-{{ col(move)}}, {{ move.sub_board }} {{ rotation(move) }}
+            {{ row(move.move) }}-{{ col(move.move)}},
+            <img class="move-image" :src="subBoardImage(move.move)">
+            <img class="move-image" :src="rotationImage(move.move)">
           </div>
         </div>
       </template>
@@ -51,6 +58,9 @@
   const channel = socket.channel("game", {})
   const size = 36
   const rows = 6
+  const black = 0
+  const white = 1
+  const empty = 2
 
   export default {
     data() {
@@ -58,25 +68,23 @@
         playing: false,
         is_finished: false,
         current_player: this.player1,
-        current_color: "black",
-        winner: "empty",
+        current_color: black,
+        winner: empty,
         board: [],
         moves: [],
         turn: 0,
-        selected_marble: ""
+        selected_marble: "",
+        time: "0",
+        leafs: "0"
       }
     },
-    props: ['player1', 'player2'],
-    mounted() { 2
+    props: ['player1', 'player2', 'depth'],
+    mounted() {
       socket.connect()
 
       channel.on("initial_board", payload => {
-        this.selected_marble = ""
-        this.current_color = payload.color
-        this.current_player = payload.player
         this.setBoard(payload.board)
         this.playing = true
-        this.checkEndingConditions()
         this.makeAIMove()
       })
 
@@ -86,7 +94,12 @@
         this.current_color = payload.color
         this.current_player = payload.player
         this.setBoard(payload.board)
-        this.moves.unshift(payload.move)
+        this.moves.unshift({
+          turn: payload.turn,
+          move: payload.move
+        })
+        this.time = +payload.time.toFixed(3)
+        this.leafs = payload.leafs.toLocaleString()
         this.winner = payload.winner
         this.checkEndingConditions()
         this.makeAIMove()
@@ -107,6 +120,9 @@
       },
       waitingForGame() {
         return !this.playing
+      },
+      disableRotate() {
+        return this.current_player != "human"
       }
     },
     methods: {
@@ -120,7 +136,8 @@
       startGame() {
         channel.push("start_game", {
           player1: this.player1,
-          player2: this.player2
+          player2: this.player2,
+          depth: this.depth
         })
       },
       makeMove(sub_board, rotation) {
@@ -144,7 +161,7 @@
         }
       },
       checkEndingConditions() {
-        if (this.winner == "black" || this.winner == "white" || this.turn == 35) {
+        if (this.winner != empty || this.turn == 35) {
           this.is_finished = true
         }
       },
@@ -165,7 +182,7 @@
         return "marble marble-" + this.winner
       },
       marbleDisabled(marble) {
-        return marble != "empty" ||
+        return marble != empty ||
           this.current_player != "human" ||
           this.is_finished
       },
@@ -175,17 +192,14 @@
       col(move) {
         return move.pos % rows + 1
       },
-      rotation(move) {
-        if (move.rotation == 0) {
-          return "clockwise"
-        }
-        return "counter clocwise"
+      rotationImage(move) {
+        return "/images/rotation-" + move.rotation + ".png"
       },
       moveClass(move) {
-        if (move.color == 0) {
-          return "marble marble-black"
-        }
-        return "marble marble-white"
+        return "marble marble-" + move.color
+      },
+      subBoardImage(move) {
+        return "/images/sub-board-" + move.sub_board + ".png"
       }
     }
   }
@@ -200,7 +214,7 @@
   .current-player {
     display: inline-block;
     vertical-align: middle;
-    height: 65px;
+    height: 80px;
     margin-right: 10px;
     font-size: 20px;
   }
@@ -224,19 +238,19 @@
     margin-right: 20px;
   }
 
-  .marble-black {
+  .marble-0 {
     background-image: url(/images/marble-black.png);
   }
 
-  .marble-white {
+  .marble-1 {
     background-image: url(/images/marble-white.png);
   }
 
-  .marble-empty {
+  .marble-2 {
     background-image: url(/images/marble-empty.png);
   }
 
-  .marble-empty:hover {
+  .marble-2:hover {
     background-image: url(/images/marble-hover.png);
     cursor: pointer;
   }
@@ -296,5 +310,10 @@
     background-image: url(/images/rotate-3-cc.png);
     bottom: 20px;
     right: -50px;
+  }
+
+  .move-image {
+    height: 30px;
+    width: 30px;
   }
 </style>
