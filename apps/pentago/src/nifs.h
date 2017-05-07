@@ -11,6 +11,6 @@
 
 void tuple_to_board(ErlNifEnv *env, const ERL_NIF_TERM arg, char* board);
 void board_to_tuple(ErlNifEnv *env, char* board, ERL_NIF_TERM* tuple);
-ERL_NIF_TERM make_move_result(ErlNifEnv *env, char* board, struct Move* move);
+ERL_NIF_TERM make_move_result(ErlNifEnv *env, char *board, struct Move *move, double d);
 
 #endif //PENTAGO_NIF_H

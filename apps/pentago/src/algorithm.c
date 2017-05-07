@@ -25,7 +25,7 @@ struct Move* minimax(char *board, char color, char depth, char turn) {
 int maximize_minimax(char *board, char color, int depth, int turn, char orig_color) {
     if (depth == 0 || turn == TURNS || board_evaluate_win(board) != EMPTY) {
         leafs++;
-        int points = board_points_in_vectors(board) + board_points_in_rows(board);
+        int points = board_points_in_rows(board) + board_points_in_vectors(board);
         if (orig_color == BLACK)
             return points;
         else
@@ -49,60 +49,63 @@ int maximize_minimax(char *board, char color, int depth, int turn, char orig_col
 }
 
 
-struct Move* alpha_beta(char *board, char color, char depth, char turn, int alpha, int beta) {
-    int current_points, moves_number, points = -9999999;
+struct Move* alphabeta(char *board, char color, char depth, char turn, int alpha, int beta) {
+    int value, moves_number, best_value = -9999999;
     struct Move* moves = get_available_moves(board, &moves_number, color, turn);
     struct Move* best_move = malloc(sizeof(struct Move));
     for (int i = 0; i < moves_number; ++i) {
         char * new_board = board_move(board, (moves + i));
-        current_points = maximize_ab(new_board, opposite_color(color), depth - 1, turn + 1, color, -beta, -alpha);
-        if (current_points > points) {
-            points = current_points;
+        value = maximize_alphabeta(new_board, opposite_color(color), depth - 1,
+                                            turn + 1, color, -beta, -alpha);
+        if (value > best_value) {
+            best_value = value;
             *best_move = *(moves + i);
         }
-        if (current_points > alpha) {
-            alpha = current_points;
+        if (best_value > alpha) {
+            alpha = best_value;
         }
         free(new_board);
         if (alpha >= beta) {
-            break;
+            free(moves);
+            return best_move;
         }
     }
 
     free(moves);
-
     return best_move;
 }
 
-int maximize_ab(char *board, char color, int depth, int turn, char orig_color, int alpha, int beta) {
+int maximize_alphabeta(char *board, char color, int depth, int turn, char orig_color, int alpha, int beta) {
     if (depth == 0 || turn == TURNS || board_evaluate_win(board) != EMPTY) {
         leafs++;
-        int points = board_points_in_vectors(board) + board_points_in_rows(board);
+        int points = board_points_in_rows(board) + board_points_in_vectors(board);
         if (orig_color == BLACK)
             return points;
         else
             return -points;
     }
 
-    int current_points, moves_number, points = -9999999;
+    int value, moves_number, best_value = -9999999;
     struct Move* moves = get_available_moves(board, &moves_number, color, turn);
     for (int i = 0; i < moves_number; ++i) {
         char * new_board = board_move(board, (moves + i));
-        current_points = maximize_ab(new_board, opposite_color(color), depth - 1, turn + 1, orig_color, -beta, -alpha);
-        if (current_points > points) {
-            points = current_points;
+        value = maximize_alphabeta(new_board,opposite_color(color), depth - 1,
+                                            turn + 1, orig_color, -beta, -alpha);
+        if (value > best_value) {
+            best_value = value;
         }
-        if (current_points > alpha) {
-            alpha = current_points;
+        if (value > alpha) {
+            alpha = value;
         }
         free(new_board);
         if (alpha >= beta) {
-            break;
+            free(moves);
+            return best_value;
         }
     }
 
     free(moves);
-    return points;
+    return best_value;
 }
 
 struct Move* get_available_moves(char* board, int *move_number, char color, int turn) {

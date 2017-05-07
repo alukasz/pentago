@@ -1,3 +1,4 @@
+#include <time.h>
 #include "erl_nif.h"
 #include "nifs.h"
 #include "board.h"
@@ -13,24 +14,26 @@ static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv
     enif_get_int(env, argv[2], &color);
     enif_get_int(env, argv[3], &depth);
     enif_get_int(env, argv[4], &turn);
+    leafs = 0;
 
     struct Move* move;
+    clock_t begin = clock();
     switch (algorithm) {
         case MINIMAX:
-//            move = alpha_beta(board, (char) color, (char) depth, (char) turn, -9999999, 9999999);
             move = minimax(board, (char) color, (char) depth, (char) turn);
-            char* new_board = board_move(board, move);
-
-            result = make_move_result(env, new_board, move);
-
-            free(new_board);
-            free(move);
             break;
+        case ALPHABETA:
         default:
-            result = enif_make_atom(env, "error");
+            move = alphabeta(board, (char) color, (char) depth, (char) turn, -9999999, 9999999);
             break;
     }
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    char* new_board = board_move(board, move);
+    result = make_move_result(env, new_board, move, time_spent);
 
+    free(new_board);
+    free(move);
     free(board);
     return result;
 }
@@ -53,7 +56,7 @@ static ERL_NIF_TERM move(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
     move->rotation = (char) rotation;
 
     char* new_board = board_move(board, move);
-    result = make_move_result(env, new_board, move);
+    result = make_move_result(env, new_board, move, 0);
 
     free(new_board);
     free(move);
@@ -130,15 +133,16 @@ void board_to_tuple(ErlNifEnv *env, char* board, ERL_NIF_TERM* tuple) {
     *tuple = enif_make_tuple_from_array(env, new_tuple, BOARD_SIZE);
 }
 
-ERL_NIF_TERM make_move_result(ErlNifEnv *env, char* board, struct Move* move) {
-    ERL_NIF_TERM erl_board, erl_pos, erl_color, erl_sub_board, erl_rotation, erl_winner, erl_leafs;
+ERL_NIF_TERM make_move_result(ErlNifEnv *env, char *board, struct Move *move, double time) {
+    ERL_NIF_TERM erl_board, erl_pos, erl_color, erl_sub_board, erl_rotation, erl_winner, erl_time, erl_leafs;
     board_to_tuple(env, board, &erl_board);
     erl_pos = enif_make_int(env, (int) move->pos);
     erl_color = enif_make_int(env, (int) move->color);
     erl_sub_board = enif_make_int(env, (int) move->sub_board);
     erl_rotation = enif_make_int(env, (int) move->rotation);
     erl_winner = enif_make_int(env, (int) board_evaluate_win(board));
-    erl_leafs = enif_make_int(env, leafs);
+    erl_time = enif_make_double(env, time);
+    erl_leafs = enif_make_long(env, leafs);
 
-    return enif_make_tuple(env, 7, erl_board, erl_pos, erl_color, erl_sub_board, erl_rotation, erl_winner, erl_leafs);
+    return enif_make_tuple(env, 8, erl_board, erl_pos, erl_color, erl_sub_board, erl_rotation, erl_winner, erl_time, erl_leafs);
 }
