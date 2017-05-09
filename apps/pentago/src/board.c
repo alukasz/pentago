@@ -35,10 +35,4 @@ char* board_move(char *board, struct Move* move) {
     return new_board;
 }
 
-inline char opposite_color(char color) {
-    if (color == BLACK)
-        return WHITE;
-
-    return BLACK;
-}
 

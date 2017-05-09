@@ -9,7 +9,7 @@ struct Move* minimax(char *board, char color, char depth, char turn) {
     struct Move* best_move = malloc(sizeof(struct Move));
     for (int i = 0; i < moves_number; ++i) {
         char * new_board = board_move(board, (moves + i));
-        current_points = maximize_minimax(new_board, opposite_color(color), depth - 1, turn + 1, color);
+        current_points = maximize_minimax(new_board, ((char)1 - color), depth - 1, turn + 1, color);
         if (current_points > points) {
             points = current_points;
             *best_move = *(moves + i);
@@ -25,18 +25,19 @@ struct Move* minimax(char *board, char color, char depth, char turn) {
 int maximize_minimax(char *board, char color, int depth, int turn, char orig_color) {
     if (depth == 0 || turn == TURNS || board_evaluate_win(board) != EMPTY) {
         leafs++;
-        int points = board_points_in_rows(board) + board_points_in_vectors(board);
+        int points = board_points_in_rows(board);// + board_points_in_vectors(board);
+//        int points = board_points_in_vectors_non_blocking(board);
         if (orig_color == BLACK)
             return points;
         else
-            return 0;
+            return -points;
     }
 
     int current_points, moves_number, points = -9999999;
     struct Move* moves = get_available_moves(board, &moves_number, color, turn);
     for (int i = 0; i < moves_number; ++i) {
         char * new_board = board_move(board, (moves + i));
-        current_points = maximize_minimax(new_board, opposite_color(color), depth - 1, turn + 1, orig_color);
+        current_points = maximize_minimax(new_board, ((char)1 - color), depth - 1, turn + 1, orig_color);
         if (current_points > points) {
             points = current_points;
         }
@@ -55,7 +56,7 @@ struct Move* alphabeta(char *board, char color, char depth, char turn, int alpha
     struct Move* best_move = malloc(sizeof(struct Move));
     for (int i = 0; i < moves_number; ++i) {
         char * new_board = board_move(board, (moves + i));
-        value = maximize_alphabeta(new_board, opposite_color(color), depth - 1,
+        value = maximize_alphabeta(new_board, ((char)1 - color), depth - 1,
                                             turn + 1, color, -beta, -alpha);
         if (value > best_value) {
             best_value = value;
@@ -79,6 +80,10 @@ int maximize_alphabeta(char *board, char color, int depth, int turn, char orig_c
     if (depth == 0 || turn == TURNS || board_evaluate_win(board) != EMPTY) {
         leafs++;
         int points = board_points_in_rows(board) + board_points_in_vectors(board);
+//        int points = board_points_in_vectors(board);
+//        int points = board_points_in_vectors_non_blocking(board);
+//        int points = 0;
+
         if (orig_color == BLACK)
             return points;
         else
@@ -89,7 +94,7 @@ int maximize_alphabeta(char *board, char color, int depth, int turn, char orig_c
     struct Move* moves = get_available_moves(board, &moves_number, color, turn);
     for (int i = 0; i < moves_number; ++i) {
         char * new_board = board_move(board, (moves + i));
-        value = maximize_alphabeta(new_board,opposite_color(color), depth - 1,
+        value = maximize_alphabeta(new_board, ((char)1) - color, depth - 1,
                                             turn + 1, orig_color, -beta, -alpha);
         if (value > best_value) {
             best_value = value;

@@ -40,6 +40,69 @@ static int points_in_row[3][7] = {
         {0, 0,               0,         0,         0,         0,         0} // EMPTY
 };
 
+static int points_in_vectors_non_blocking[3][7] = {
+        {IN_ROW_0, IN_ROW_1, IN_ROW_2, IN_ROW_3, IN_ROW_4, IN_ROW_5, IN_ROW_6}, // BLACK
+        {IN_ROW_0, -IN_ROW_1, -IN_ROW_2, -IN_ROW_3, -IN_ROW_4, -IN_ROW_5, -IN_ROW_6}, // WHITE
+        {0, 0,               0,         0,         0,         0,         0} // EMPTY
+};
+
+// the goal of this evaluation is to give points for 2/3/4/5 marbles in VECTOR. e.g.
+// bbbbbw - max points
+// bbbwbb - white between 5 blacks, 0 points
+// bbbewe - 3 blacks, white blocking 5 in row, 0 points
+// if the number of marbles is 2/3/4, it checks if 5 in row is possible
+// before giving points.
+int board_points_in_vectors_non_blocking(char *board) {
+    int points = 0, black, white;
+    char current;
+
+    for (int i = 0; i < VECTORS; ++i) {
+        black = 0;
+        white = 0;
+        for (int j = 0; j < BOARD_ROWS; ++j) {
+            current = *(board + vectors[i][j]);
+            switch (current) {
+                case BLACK:
+                    ++black;
+                    break;
+                case WHITE:
+                    ++white;
+                    break;
+                default:
+                    break;
+            }
+        }
+        // add black points
+        switch (white) {
+            case 0:
+                points += points_in_vectors_non_blocking[BLACK][black];
+                break;
+            case 1:
+                if (*(board + vectors[i][0]) == WHITE || *(board + vectors[i][5]) == WHITE) {
+                    points += points_in_vectors_non_blocking[BLACK][black];
+                }
+                break;
+            default:
+                break;
+        }
+        // add white points
+        switch (black) {
+            case 0:
+                points += points_in_vectors_non_blocking[WHITE][white];
+                break;
+            case 1:
+                if (*(board + vectors[i][0]) == BLACK || *(board + vectors[i][5]) == BLACK) {
+                    points += points_in_vectors_non_blocking[WHITE][white];
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    return points;
+}
+
 
 int board_points_in_vectors(char *board) {
     int points = 0, black, white;

@@ -25,6 +25,5 @@ struct Move {
 };
 
 char* board_move(char* board, struct Move *move);
-char opposite_color(char color);
 
 #endif
