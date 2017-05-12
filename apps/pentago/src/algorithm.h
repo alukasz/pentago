@@ -1,20 +1,17 @@
 #include "board.h"
 
-#ifndef PENTAGO_ALGORITHM_H
-#define PENTAGO_ALGORITHM_H
+#ifndef BIT_BOARD_ALGORITHM_H
+#define BIT_BOARD_ALGORITHM_H
 
-#define TURNS 35
-#define MINIMAX 0
-#define ALPHABETA 1
+#define NEGAMAX 0
+#define NEGAMAX_AB 1
 
-long leafs;
+uint64_t leafs;
 
-struct Move* minimax(char* board, char color, char rotation, char turn);
-int maximize_minimax(char *board, char color, int depth, int turn, char orig_color);
+struct move* alg_negamax(struct board* board, uint8_t color, uint8_t depth, uint8_t turn);
+int16_t alg_negamax_rec(struct board* board, uint8_t color, uint8_t depth, uint8_t turn);
+struct move* alg_negamax_ab(struct board* board, uint8_t color, uint8_t depth, uint8_t turn, int16_t alpha, int16_t beta);
+int16_t alg_negamax_ab_rec(struct board* board, uint8_t color, uint8_t depth, uint8_t turn, int16_t alpha, int16_t beta);
+struct move* get_available_moves(struct board* board, int16_t *move_number, uint8_t color, uint8_t turn);
 
-struct Move* alphabeta(char *board, char color, char rotation, char turn, int alpha, int beta);
-int maximize_alphabeta(char *board, char color, int depth, int turn, char orig_color, int alpha, int beta);
-
-struct Move* get_available_moves(char* board, int *move_number, char color, int turn);
-
-#endif //PENTAGO_ALGORITHM_H
+#endif //BIT_BOARD_ALGORITHM_H

@@ -1,71 +1,57 @@
-#include <malloc.h>
 #include "algorithm.h"
-#include "board.h"
-#include "evaluation.h"
 
-struct Move* minimax(char *board, char color, char depth, char turn) {
-    int current_points, moves_number, points = -9999999;
-    struct Move* moves = get_available_moves(board, &moves_number, color, turn);
-    struct Move* best_move = malloc(sizeof(struct Move));
-    for (int i = 0; i < moves_number; ++i) {
-        char * new_board = board_move(board, (moves + i));
-        current_points = maximize_minimax(new_board, ((char)1 - color), depth - 1, turn + 1, color);
-        if (current_points > points) {
-            points = current_points;
-            *best_move = *(moves + i);
-        }
+struct move* alg_negamax(struct board* board, uint8_t color, uint8_t depth, uint8_t turn) {
+    int16_t move_number, value, best_value = -10000;
+    struct move* moves = get_available_moves(board, &move_number, color, turn);
+    struct move* best_move = malloc(sizeof(struct move));
+
+    for (int i = 0; i < move_number; ++i) {
+        struct board* new_board = board_move(board, (moves + i));
+        value = -alg_negamax_rec(new_board, (uint8_t)1 - color, depth - (uint8_t)1, turn + (uint8_t)1);
         free(new_board);
+        if (value > best_value) {
+            *best_move = *(moves + i);
+            best_value = value;
+        }
     }
 
     free(moves);
-
     return best_move;
 }
 
-int maximize_minimax(char *board, char color, int depth, int turn, char orig_color) {
-    if (depth == 0 || turn == TURNS || board_evaluate_win(board) != EMPTY) {
-        leafs++;
-        int points = board_points_in_rows(board);// + board_points_in_vectors(board);
-//        int points = board_points_in_vectors_non_blocking(board);
-        if (orig_color == BLACK)
-            return points;
-        else
-            return -points;
+int16_t alg_negamax_rec(struct board* board, uint8_t color, uint8_t depth, uint8_t turn) {
+    if (depth == 0 || board_winner(board) != EMPTY) {
+        ++leafs;
+        return board_evaluate(board, color);
     }
+    int16_t move_number, value, best_value = -10000;
+    struct move* moves = get_available_moves(board, &move_number, color, turn);
 
-    int current_points, moves_number, points = -9999999;
-    struct Move* moves = get_available_moves(board, &moves_number, color, turn);
-    for (int i = 0; i < moves_number; ++i) {
-        char * new_board = board_move(board, (moves + i));
-        current_points = maximize_minimax(new_board, ((char)1 - color), depth - 1, turn + 1, orig_color);
-        if (current_points > points) {
-            points = current_points;
-        }
+    for (int i = 0; i < move_number; ++i) {
+        struct board* new_board = board_move(board, (moves + i));
+        value = -alg_negamax_rec(new_board, (uint8_t)1 - color, depth - (uint8_t)1, turn + (uint8_t)1);
         free(new_board);
+        if (value > best_value) best_value = value;
     }
 
     free(moves);
-
-    return points;
+    return best_value;
 }
 
+struct move* alg_negamax_ab(struct board* board, uint8_t color, uint8_t depth, uint8_t turn, int16_t alpha, int16_t beta) {
+    int16_t move_number, value, best_value = -10000;
+    struct move* moves = get_available_moves(board, &move_number, color, turn);
+    struct move* best_move = malloc(sizeof(struct move));
 
-struct Move* alphabeta(char *board, char color, char depth, char turn, int alpha, int beta) {
-    int value, moves_number, best_value = -9999999;
-    struct Move* moves = get_available_moves(board, &moves_number, color, turn);
-    struct Move* best_move = malloc(sizeof(struct Move));
-    for (int i = 0; i < moves_number; ++i) {
-        char * new_board = board_move(board, (moves + i));
-        value = maximize_alphabeta(new_board, ((char)1 - color), depth - 1,
-                                            turn + 1, color, -beta, -alpha);
-        if (value > best_value) {
-            best_value = value;
-            *best_move = *(moves + i);
-        }
-        if (best_value > alpha) {
-            alpha = best_value;
-        }
+    for (int i = 0; i < move_number; ++i) {
+        struct board* new_board = board_move(board, (moves + i));
+        value = -alg_negamax_ab_rec(new_board, (uint8_t)1 - color, depth - (uint8_t)1, turn + (uint8_t)1, -beta, -alpha);
         free(new_board);
+        if (value > best_value) {
+            *best_move = *(moves + i);
+            best_value = value;
+        }
+        if (best_value > alpha) alpha = best_value;
         if (alpha >= beta) {
             free(moves);
             return best_move;
@@ -76,33 +62,20 @@ struct Move* alphabeta(char *board, char color, char depth, char turn, int alpha
     return best_move;
 }
 
-int maximize_alphabeta(char *board, char color, int depth, int turn, char orig_color, int alpha, int beta) {
-    if (depth == 0 || turn == TURNS || board_evaluate_win(board) != EMPTY) {
-        leafs++;
-        int points = board_points_in_rows(board) + board_points_in_vectors(board);
-//        int points = board_points_in_vectors(board);
-//        int points = board_points_in_vectors_non_blocking(board);
-//        int points = 0;
-
-        if (orig_color == BLACK)
-            return points;
-        else
-            return -points;
+int16_t alg_negamax_ab_rec(struct board* board, uint8_t color, uint8_t depth, uint8_t turn, int16_t alpha, int16_t beta) {
+    if (depth == 0 || board_winner(board) != EMPTY) {
+        ++leafs;
+        return board_evaluate(board, color);
     }
+    int16_t move_number, value, best_value = -10000;
+    struct move* moves = get_available_moves(board, &move_number, color, turn);
 
-    int value, moves_number, best_value = -9999999;
-    struct Move* moves = get_available_moves(board, &moves_number, color, turn);
-    for (int i = 0; i < moves_number; ++i) {
-        char * new_board = board_move(board, (moves + i));
-        value = maximize_alphabeta(new_board, ((char)1) - color, depth - 1,
-                                            turn + 1, orig_color, -beta, -alpha);
-        if (value > best_value) {
-            best_value = value;
-        }
-        if (value > alpha) {
-            alpha = value;
-        }
+    for (int i = 0; i < move_number; ++i) {
+        struct board* new_board = board_move(board, (moves + i));
+        value = -alg_negamax_ab_rec(new_board, (uint8_t)1 - color, depth - (uint8_t)1, turn + (uint8_t)1, -beta, -alpha);
         free(new_board);
+        if (value > best_value) best_value = value;
+        if (best_value > alpha) alpha = best_value;
         if (alpha >= beta) {
             free(moves);
             return best_value;
@@ -113,22 +86,27 @@ int maximize_alphabeta(char *board, char color, int depth, int turn, char orig_c
     return best_value;
 }
 
-struct Move* get_available_moves(char* board, int *move_number, char color, int turn) {
-    struct Move* moves = malloc((TURNS + 1 - turn) * 8 * sizeof(struct Move));
+struct move* get_available_moves(struct board* board, int16_t *move_number, uint8_t color, uint8_t turn) {
+    uint64_t colors = board->color[BLACK] | board->color[WHITE];
+    struct move* moves = malloc((TURNS + 1 - turn) * 8 * sizeof(struct move));
     *move_number = 0;
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        if (*(board + i) == EMPTY) {
-            for (char sub_board = 0; sub_board < SUB_BOARDS; ++sub_board) {
-                for (char rotation = 0; rotation < ROTATIONS; ++rotation) {
-                    (moves + *move_number)->pos = (char) i;
+
+    uint64_t mask;
+    for (uint8_t i = 0; i < BOARD_SIZE; ++i) {
+        mask = pos_mask[i];
+        if((colors & mask) == 0) {
+            for (uint8_t sub_board = 0; sub_board < SUB_BOARDS; ++sub_board) {
+                for (uint8_t rotation = 0; rotation < ROTATIONS; ++rotation) {
+                    (moves + *move_number)->pos = i;
                     (moves + *move_number)->color = color;
                     (moves + *move_number)->sub_board = sub_board;
                     (moves + *move_number)->rotation = rotation;
-                    (*move_number)++;
+                    ++(*move_number);
                 }
             }
-        }
+        };
     }
 
     return moves;
 }
+

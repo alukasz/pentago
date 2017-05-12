@@ -1,6 +1,6 @@
 defmodule Pentago.Game do
   use GenServer
-  alias Pentago.Game.FastBoard
+  alias Pentago.Game.BitBoard
 
   @name __MODULE__
   @minimax 0
@@ -28,19 +28,20 @@ defmodule Pentago.Game do
   end
 
   def handle_call({:make_move, %{player: :human} = move}, _from, state) do
-    result = FastBoard.move(state.board, move.pos, move.color, move.sub_board, move.rotation)
+    result = BitBoard.move(state.board, move.pos, move.color, move.sub_board, move.rotation)
 
     result(state, result)
   end
 
   def handle_call({:make_move, %{player: :minimax} = move}, _from, state) do
-    result = FastBoard.make_move(state.board, @minimax, move.color, state.depth, state.turn)
+    result = BitBoard.make_move(state.board, @minimax, move.color, state.depth, state.turn)
 
+    IO.inspect(result)
     result(state, result)
   end
 
   def handle_call({:make_move, %{player: :alphabeta} = move}, _from, state) do
-    result = FastBoard.make_move(state.board, @alphabeta, move.color, state.depth, state.turn)
+    result = BitBoard.make_move(state.board, @alphabeta, move.color, state.depth, state.turn)
 
     result(state, result)
   end
