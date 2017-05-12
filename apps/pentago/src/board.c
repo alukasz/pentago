@@ -1,38 +1,7 @@
 #include "board.h"
 #include "algorithm.h"
 
-const uint64_t pos_mask[36] = {
-        1ull <<  0, 1ull <<  1, 1ull <<  2, 1ull << 15, 1ull << 16, 1ull <<  9,
-        1ull <<  7, 1ull <<  8, 1ull <<  3, 1ull << 14, 1ull << 17, 1ull << 10,
-        1ull <<  6, 1ull <<  5, 1ull <<  4, 1ull << 13, 1ull << 12, 1ull << 11,
-        1ull << 22, 1ull << 23, 1ull << 24, 1ull << 29, 1ull << 30, 1ull << 31,
-        1ull << 21, 1ull << 26, 1ull << 25, 1ull << 28, 1ull << 35, 1ull << 32,
-        1ull << 20, 1ull << 19, 1ull << 18, 1ull << 27, 1ull << 34, 1ull << 33
-};
-
-const uint64_t win_patterns[32] = {
-//horizontal
-        WIN_PATTERN( 0,  1,  2, 15, 16), WIN_PATTERN( 1,  2, 15, 16,  9),
-        WIN_PATTERN( 7,  8,  3, 14, 17), WIN_PATTERN( 8,  3, 14, 17, 10),
-        WIN_PATTERN( 6,  5,  4, 13, 12), WIN_PATTERN( 5,  4, 13, 12, 11),
-        WIN_PATTERN(22, 23, 24, 29, 30), WIN_PATTERN(23, 24, 29, 30, 31),
-        WIN_PATTERN(21, 26, 25, 28, 35), WIN_PATTERN(26, 25, 28, 35, 32),
-        WIN_PATTERN(20, 19, 18, 27, 34), WIN_PATTERN(19, 18, 27, 34, 33),
-//vertical
-        WIN_PATTERN( 0,  7,  6, 22, 21), WIN_PATTERN( 7,  6, 22, 21, 20),
-        WIN_PATTERN( 1,  8,  5, 23, 26), WIN_PATTERN( 8,  5, 23, 26, 19),
-        WIN_PATTERN( 2,  3,  4, 24, 25), WIN_PATTERN( 3,  4, 24, 25, 18),
-        WIN_PATTERN(15, 14, 13, 29, 28), WIN_PATTERN(14, 13, 29, 28, 27),
-        WIN_PATTERN(16, 17, 12, 30, 35), WIN_PATTERN(17, 12, 30, 35, 34),
-        WIN_PATTERN( 9, 10, 11, 31, 32), WIN_PATTERN(10, 11, 31, 32, 33),
-//diagonal
-        WIN_PATTERN( 0,  8,  4, 29, 35), WIN_PATTERN( 8,  4, 29, 35, 33),
-        WIN_PATTERN( 7,  5, 24, 28, 34), WIN_PATTERN( 1,  3, 13, 30, 32),
-        WIN_PATTERN( 9, 17, 13, 24, 26), WIN_PATTERN(17, 13, 24, 26, 20),
-        WIN_PATTERN(16, 14,  4, 23, 21), WIN_PATTERN(10, 12, 29, 25, 19),
-};
-
-uint8_t board_get(struct board* board, char pos) {
+uint32_t board_get(struct board* board, char pos) {
     uint64_t mask = pos_mask[pos];
     if(board->color[BLACK] & mask) return BLACK;
     if(board->color[WHITE] & mask) return WHITE;
@@ -61,13 +30,104 @@ struct board* board_move(struct board* board, struct move* move) {
 }
 
 int board_winner(struct board* board) {
-    uint8_t winner = 0;
+    uint32_t winner = 0;
+    uint64_t black = board->color[BLACK], white = board->color[WHITE];
 
-    for (int i = 0; i < WIN_PATTERNS; ++i) {
-        uint64_t wp = win_patterns[i];
-        if ((board->color[BLACK] & wp) == wp) winner |= 1;
-        if ((board->color[WHITE] & wp) == wp) winner |= 2;
-    }
+    if ((black & 98311) == 98311) winner |= 1;
+    if ((white & 98311) == 98311) winner |= 2;
+
+    if ((black & 98822) == 98822) winner |= 1;
+    if ((white & 98822) == 98822) winner |= 2;
+
+    if ((black & 147848) == 147848) winner |= 1;
+    if ((white & 147848) == 147848) winner |= 2;
+
+    if ((black & 148744) == 148744) winner |= 1;
+    if ((white & 148744) == 148744) winner |= 2;
+
+    if ((black & 12400) == 12400) winner |= 1;
+    if ((white & 12400) == 12400) winner |= 2;
+
+    if ((black & 14384) == 14384) winner |= 1;
+    if ((white & 14384) == 14384) winner |= 2;
+
+    if ((black & 1639972864) == 1639972864) winner |= 1;
+    if ((white & 1639972864) == 1639972864) winner |= 2;
+
+    if ((black & 3783262208) == 3783262208) winner |= 1;
+    if ((white & 3783262208) == 3783262208) winner |= 2;
+
+    if ((black & 34730934272) == 34730934272) winner |= 1;
+    if ((white & 34730934272) == 34730934272) winner |= 2;
+
+    if ((black & 39023804416) == 39023804416) winner |= 1;
+    if ((white & 39023804416) == 39023804416) winner |= 2;
+
+    if ((black & 17315921920) == 17315921920) winner |= 1;
+    if ((white & 17315921920) == 17315921920) winner |= 2;
+
+    if ((black & 25904807936) == 25904807936) winner |= 1;
+    if ((white & 25904807936) == 25904807936) winner |= 2;
+
+    if ((black & 6291649) == 6291649) winner |= 1;
+    if ((white & 6291649) == 6291649) winner |= 2;
+
+    if ((black & 7340224) == 7340224) winner |= 1;
+    if ((white & 7340224) == 7340224) winner |= 2;
+
+    if ((black & 75497762) == 75497762) winner |= 1;
+    if ((white & 75497762) == 75497762) winner |= 2;
+
+    if ((black & 76022048) == 76022048) winner |= 1;
+    if ((white & 76022048) == 76022048) winner |= 2;
+
+    if ((black & 50331676) == 50331676) winner |= 1;
+    if ((white & 50331676) == 50331676) winner |= 2;
+
+    if ((black & 50593816) == 50593816) winner |= 1;
+    if ((white & 50593816) == 50593816) winner |= 2;
+
+    if ((black & 805363712) == 805363712) winner |= 1;
+    if ((white & 805363712) == 805363712) winner |= 2;
+
+    if ((black & 939548672) == 939548672) winner |= 1;
+    if ((white & 939548672) == 939548672) winner |= 2;
+
+    if ((black & 35433680896) == 35433680896) winner |= 1;
+    if ((white & 35433680896) == 35433680896) winner |= 2;
+
+    if ((black & 52613484544) == 52613484544) winner |= 1;
+    if ((white & 52613484544) == 52613484544) winner |= 2;
+
+    if ((black & 6442454528) == 6442454528) winner |= 1;
+    if ((white & 6442454528) == 6442454528) winner |= 2;
+
+    if ((black & 15032388608) == 15032388608) winner |= 1;
+    if ((white & 15032388608) == 15032388608) winner |= 2;
+
+    if ((black & 34896609553) == 34896609553) winner |= 1;
+    if ((white & 34896609553) == 34896609553) winner |= 2;
+
+    if ((black & 43486544144) == 43486544144) winner |= 1;
+    if ((white & 43486544144) == 43486544144) winner |= 2;
+
+    if ((black & 17465082016) == 17465082016) winner |= 1;
+    if ((white & 17465082016) == 17465082016) winner |= 2;
+
+    if ((black & 5368717322) == 5368717322) winner |= 1;
+    if ((white & 5368717322) == 5368717322) winner |= 2;
+
+    if ((black & 84025856) == 84025856) winner |= 1;
+    if ((white & 84025856) == 84025856) winner |= 2;
+
+    if ((black & 85073920) == 85073920) winner |= 1;
+    if ((white & 85073920) == 85073920) winner |= 2;
+
+    if ((black & 10567696) == 10567696) winner |= 1;
+    if ((white & 10567696) == 10567696) winner |= 2;
+
+    if ((black & 570954752) == 570954752) winner |= 1;
+    if ((white & 570954752) == 570954752) winner |= 2;
 
     switch (winner) {
         case 1:
@@ -81,28 +141,187 @@ int board_winner(struct board* board) {
     }
 }
 
-const int points_value[6] = { 0, 1, 3, 9, 27, 127 };
+int32_t board_evaluate(struct board* board, uint32_t color) {
+    int32_t points = 0;
+    uint64_t b_wp, w_wp, black = board->color[BLACK], white = board->color[WHITE];
 
-int16_t board_evaluate(struct board* board, uint8_t color) {
-    int16_t points = 0;
+    b_wp = black & 98311;
+    w_wp = white & 98311;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
 
-    for (int i = 0; i < WIN_PATTERNS; ++i) {
-        uint64_t wp = win_patterns[i];
-        uint64_t b_wp = board->color[BLACK] & wp;
-        uint64_t w_wp = board->color[WHITE] & wp;
-        if (w_wp == 0) points += points_value[BIT_COUNT(b_wp)];
-        else if (b_wp == 0) points -= points_value[BIT_COUNT(w_wp)];
-    }
+    b_wp = black & 98822;
+    w_wp = white & 98822;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 147848;
+    w_wp = white & 147848;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 148744;
+    w_wp = white & 148744;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 12400;
+    w_wp = white & 12400;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 14384;
+    w_wp = white & 14384;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 1639972864;
+    w_wp = white & 1639972864;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 3783262208;
+    w_wp = white & 3783262208;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 34730934272;
+    w_wp = white & 34730934272;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 39023804416;
+    w_wp = white & 39023804416;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 17315921920;
+    w_wp = white & 17315921920;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 25904807936;
+    w_wp = white & 25904807936;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 6291649;
+    w_wp = white & 6291649;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 7340224;
+    w_wp = white & 7340224;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 75497762;
+    w_wp = white & 75497762;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 76022048;
+    w_wp = white & 76022048;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 50331676;
+    w_wp = white & 50331676;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 50593816;
+    w_wp = white & 50593816;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 805363712;
+    w_wp = white & 805363712;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 939548672;
+    w_wp = white & 939548672;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 35433680896;
+    w_wp = white & 35433680896;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 52613484544;
+    w_wp = white & 52613484544;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 6442454528;
+    w_wp = white & 6442454528;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 15032388608;
+    w_wp = white & 15032388608;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 34896609553;
+    w_wp = white & 34896609553;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 43486544144;
+    w_wp = white & 43486544144;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 17465082016;
+    w_wp = white & 17465082016;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 5368717322;
+    w_wp = white & 5368717322;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 84025856;
+    w_wp = white & 84025856;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 85073920;
+    w_wp = white & 85073920;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 10567696;
+    w_wp = white & 10567696;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 570954752;
+    w_wp = white & 570954752;
+    if (w_wp == 0) points += points_value[bit_count(b_wp)];
+    else if (b_wp == 0) points -= points_value[bit_count(w_wp)];
 
     return (color == BLACK ? points : -points);
 }
 
-static uint64_t rotate_sub_board_cw(uint64_t b, int q) {
+inline uint64_t rotate_sub_board_cw(uint64_t b, int q) {
     uint64_t m = 0xFFull << (q*9);
     return (b & ~m) | (((b & m) >> 6) & m) | (((b & m) << 2) & m);
 }
 
-static uint64_t rotate_sub_board_ccw(uint64_t b, int q) {
+inline uint64_t rotate_sub_board_ccw(uint64_t b, int q) {
     uint64_t m = 0xFFull << (q*9);
     return (b & ~m) | (((b & m) >> 2) & m) | (((b & m) << 6) & m);
+}
+
+inline int bit_count(uint64_t n) {
+    return bits_set_table[(n >> 0)  & 0xff] +
+           bits_set_table[(n >> 8)  & 0xff] +
+           bits_set_table[(n >> 16) & 0xff] +
+           bits_set_table[(n >> 24) & 0xff] +
+           bits_set_table[(n >> 32) & 0xff];
 }

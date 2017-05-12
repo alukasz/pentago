@@ -41,11 +41,11 @@ static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv
     clock_t begin = clock();
     switch (algorithm) {
         case NEGAMAX:
-            move = alg_negamax(board, (uint8_t) color, (uint8_t) depth, (uint8_t) turn);
+            move = alg_negamax(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn);
             break;
         case NEGAMAX_AB:
         default:
-            move = alg_negamax_ab(board, (uint8_t) color, (uint8_t) depth, (uint8_t) turn, -10000, 10000);
+            move = alg_negamax_ab(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, -10000, 10000);
             break;
     }
     clock_t end = clock();
@@ -109,8 +109,8 @@ ERL_NIF_TERM make_move_result(ErlNifEnv *env, struct board* board, struct move *
     erl_rotation = enif_make_int(env, (int) move->rotation);
     erl_winner = enif_make_int(env, board_winner(board));
     erl_time = enif_make_double(env, time);
-    erl_leafs = enif_make_long(env, leafs);
+    erl_leafs = enif_make_long(env, nodes);
 
-    leafs = 0;
+    nodes = 0;
     return enif_make_tuple(env, 8, erl_board, erl_pos, erl_color, erl_sub_board, erl_rotation, erl_winner, erl_time, erl_leafs);
 }

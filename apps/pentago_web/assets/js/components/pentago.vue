@@ -13,7 +13,7 @@
         <div class="current-player">Current player: <strong>{{ current_player }}</strong> </div>
         <div :class="currentColor"></div>
         <span class="pull-right">
-          leafs: {{ leafs }}<br>
+          nodes: {{ leafs }}<br>
           time: {{ time }} s.<br>
         </span>
       </div>

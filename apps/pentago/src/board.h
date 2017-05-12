@@ -12,16 +12,38 @@
 
 #define BOARD_SIZE 36
 #define TURNS 35
-#define WIN_PATTERNS 32
 #define SUB_BOARDS 4
 #define ROTATIONS 2
 
-#define BIT_COUNT(x) __builtin_popcountll(x)
-#define WIN_PATTERN(a,b,c,d,e) ((1ull<<(a)) | (1ull<<(b)) | (1ull<<(c)) | (1ull<<(d)) | (1ull<<(e)))
+static const uint64_t pos_mask[36] = {
+        1ull <<  0, 1ull <<  1, 1ull <<  2, 1ull << 15, 1ull << 16, 1ull <<  9,
+        1ull <<  7, 1ull <<  8, 1ull <<  3, 1ull << 14, 1ull << 17, 1ull << 10,
+        1ull <<  6, 1ull <<  5, 1ull <<  4, 1ull << 13, 1ull << 12, 1ull << 11,
+        1ull << 22, 1ull << 23, 1ull << 24, 1ull << 29, 1ull << 30, 1ull << 31,
+        1ull << 21, 1ull << 26, 1ull << 25, 1ull << 28, 1ull << 35, 1ull << 32,
+        1ull << 20, 1ull << 19, 1ull << 18, 1ull << 27, 1ull << 34, 1ull << 33
+};
 
-const uint64_t pos_mask[36];
+static const unsigned char bits_set_table[] = {
+        0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+        1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+        2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+        3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+        4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
+};
 
-const uint64_t win_patterns[32];
+static const int points_value[6] = { 0, 1, 3, 9, 27, 127 };
 
 struct board {
     uint64_t color[2];
@@ -35,11 +57,12 @@ struct move {
 };
 
 struct board *board_move(struct board *board, struct move *move);
-uint8_t board_get(struct board* board, char pos);
+uint32_t board_get(struct board* board, char pos);
 void board_set(struct board* board, char pos, int color);
 int board_winner(struct board* board);
-int16_t board_evaluate(struct board* board, uint8_t color);
-static uint64_t rotate_sub_board_cw(uint64_t b, int q);
-static uint64_t rotate_sub_board_ccw(uint64_t b, int q);
+int32_t board_evaluate(struct board* board, uint32_t color);
+inline uint64_t rotate_sub_board_cw(uint64_t b, int q);
+inline uint64_t rotate_sub_board_ccw(uint64_t b, int q);
+inline int bit_count(uint64_t n);
 
 #endif //BIT_BOARD_BOARD_H
