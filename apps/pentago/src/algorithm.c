@@ -88,23 +88,26 @@ int32_t alg_negamax_ab_rec(struct board* board, uint32_t color, uint32_t depth, 
 
 struct move* get_available_moves(struct board* board, int32_t *move_number, uint32_t color, uint32_t turn) {
     uint64_t colors = board->color[BLACK] | board->color[WHITE];
-    struct move* moves = malloc((TURNS + 1 - turn) * 8 * sizeof(struct move));
+    struct move* moves = calloc((TURNS + 1 - turn) * 8, sizeof(struct move));
     *move_number = 0;
 
-    uint64_t mask;
+    uint64_t mask, colors_with_mask, rot_mask[4] = {0x1FFull, 0x1FFull << 9, 0x1FFull << 18, 0x1FFull << 27};
     for (uint8_t i = 0; i < BOARD_SIZE; ++i) {
         mask = pos_mask[i];
         if((colors & mask) == 0) {
+            colors_with_mask = colors | mask;
             for (uint8_t sub_board = 0; sub_board < SUB_BOARDS; ++sub_board) {
-                for (uint8_t rotation = 0; rotation < ROTATIONS; ++rotation) {
-                    (moves + *move_number)->pos = i;
-                    (moves + *move_number)->color = (uint8_t) color;
-                    (moves + *move_number)->sub_board = sub_board;
-                    (moves + *move_number)->rotation = rotation;
-                    ++(*move_number);
+                if ((colors_with_mask & rot_mask[sub_board]) != 0) {
+                    for (uint8_t rotation = 0; rotation < ROTATIONS; ++rotation) {
+                        (moves + *move_number)->pos = i;
+                        (moves + *move_number)->color = (uint8_t) color;
+                        (moves + *move_number)->sub_board = sub_board;
+                        (moves + *move_number)->rotation = rotation;
+                        ++(*move_number);
+                    }
                 }
             }
-        };
+        }
     }
 
     return moves;

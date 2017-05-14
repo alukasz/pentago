@@ -28,7 +28,9 @@ static ERL_NIF_TERM move(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
 
 static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv) {
     ERL_NIF_TERM result;
-    struct board* board = calloc(1, sizeof(struct board));
+    struct board* board = malloc(sizeof(struct board));
+    board->color[BLACK] = 0ul;
+    board->color[WHITE] = 0ul;
     struct move *move;
     int algorithm,  color, depth, turn;
 
