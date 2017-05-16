@@ -1,9 +1,9 @@
+#ifndef BIT_BOARD_BOARD_H
+#define BIT_BOARD_BOARD_H
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-
-#ifndef BIT_BOARD_BOARD_H
-#define BIT_BOARD_BOARD_H
 
 #define BLACK 0
 #define WHITE 1
@@ -26,15 +26,16 @@ static const uint64_t pos_mask[36] = {
 
 static const int points_value[6] = { 0, 1, 3, 9, 27, 127 };
 
-struct board {
-    uint64_t color[2];
-};
-
 struct move {
     uint8_t pos;
-    uint8_t color : 2;
-    uint8_t sub_board : 4;
-    uint8_t rotation : 2;
+    uint8_t color;// : 2;
+    uint8_t sub_board;// : 4;
+    uint8_t rotation;// : 2;
+    int32_t points;
+};
+
+struct board {
+    uint64_t color[2];
 };
 
 struct board *board_move(struct board *board, struct move *move);

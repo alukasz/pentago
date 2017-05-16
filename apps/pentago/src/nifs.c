@@ -45,10 +45,14 @@ static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv
         case NEGAMAX:
             move = alg_negamax(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn);
             break;
+        case 2:
+            move = alg_negamax_ab_sorted(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, -10000, 10000);
+            break;
         case NEGAMAX_AB:
         default:
             move = alg_negamax_ab(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, -10000, 10000);
             break;
+
     }
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;

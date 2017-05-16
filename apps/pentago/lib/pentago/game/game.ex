@@ -24,7 +24,7 @@ defmodule Pentago.Game do
   end
 
   def make_move(move) do
-    GenServer.call(@name, {:make_move, move}, 100_000)
+    GenServer.call(@name, {:make_move, move}, 10_000_000)
   end
 
   def handle_call({:make_move, %{player: :human} = move}, _from, state) do
