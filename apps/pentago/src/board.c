@@ -319,9 +319,17 @@ inline uint64_t rotate_sub_board_ccw(uint64_t b, int q) {
 }
 
 inline int bit_count(uint64_t n) {
-    return bits_set_table[(n >> 0)  & 0xff] +
-           bits_set_table[(n >> 8)  & 0xff] +
-           bits_set_table[(n >> 16) & 0xff] +
-           bits_set_table[(n >> 24) & 0xff] +
-           bits_set_table[(n >> 32) & 0xff];
+    int count = (n > 0);
+    if((n &= (n - 1))){ ++count;
+        if((n &= (n - 1))){ ++count;
+            if((n &= (n - 1))){ ++count;
+                if((n &= (n - 1))){ ++count;
+                    if((n & (n - 1))){ ++count;
+                    }
+                }
+            }
+        }
+    }
+
+    return count;
 }
