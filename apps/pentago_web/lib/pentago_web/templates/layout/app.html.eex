@@ -15,12 +15,38 @@
   <body>
     <div class="container">
       <header class="header">
-        <nav role="navigation">
-          <ul class="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-          </ul>
-        </nav>
-        <span class="logo"></span>
+        <form class="form-inline" method="GET" action="/game">
+          <div class="form-group">
+            <label for="exampleInputName2">Player 1</label>
+            <select class="form-control" name="player1">
+              <option value="human">Human</option>
+              <option value="minimax">MiniMax</option>
+              <option value="alphabeta">AB</option>
+              <option value="ab_sorted">AB sorted</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputName2">Player 2</label>
+            <select class="form-control" name="player2">
+              <option value="human">Human</option>
+              <option value="minimax">MiniMax</option>
+              <option value="alphabeta">AB</option>
+              <option value="ab_sorted">AB sorted</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputName2">Depth</label>
+            <select class="form-control" name="depth">
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-default">Play</button>
+        </form>
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
