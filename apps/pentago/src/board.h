@@ -32,6 +32,7 @@ struct move {
     uint8_t sub_board;// : 4;
     uint8_t rotation;// : 2;
     int32_t points;
+    struct board* board;
 };
 
 struct board {

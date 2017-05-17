@@ -179,6 +179,10 @@
         } 
       },
       winnerClass() {
+        if (this.winner == 3) {
+          return "marble marble-empty"
+        }
+
         return "marble marble-" + this.winner
       },
       marbleDisabled(marble) {

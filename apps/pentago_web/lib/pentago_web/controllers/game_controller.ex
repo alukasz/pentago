@@ -1,7 +1,7 @@
 defmodule Pentago.Web.GameController do
   use Pentago.Web, :controller
 
-  @available_players ["minimax", "human", "random", "alphabeta"]
+  @available_players ["minimax", "human", "ab_sorted", "alphabeta"]
 
   def index(conn, params) do
     player1 = Map.get(params, "player1", "minimax")

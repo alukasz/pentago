@@ -5,6 +5,7 @@ defmodule Pentago.Game do
   @name __MODULE__
   @minimax 0
   @alphabeta 1
+  @alphabeta_sorted 2
   @black 0
   @white 1
   @empty 2
@@ -42,6 +43,12 @@ defmodule Pentago.Game do
 
   def handle_call({:make_move, %{player: :alphabeta} = move}, _from, state) do
     result = BitBoard.make_move(state.board, @alphabeta, move.color, state.depth, state.turn)
+
+    result(state, result)
+  end
+
+  def handle_call({:make_move, %{player: :ab_sorted} = move}, _from, state) do
+    result = BitBoard.make_move(state.board, @alphabeta_sorted, move.color, state.depth, state.turn)
 
     result(state, result)
   end

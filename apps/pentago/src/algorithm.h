@@ -5,6 +5,7 @@
 
 #define NEGAMAX 0
 #define NEGAMAX_AB 1
+#define NEGAMAX_AB_SORTED 2
 
 uint64_t nodes;
 
@@ -18,4 +19,7 @@ int32_t alg_negamax_ab_sorted_rec(struct board* board, uint32_t color, uint32_t 
 
 struct move* get_available_moves(struct board* board, size_t *move_number, uint32_t color, uint32_t turn);
 struct move* get_sorted_available_moves(struct board* board, size_t *move_number, uint32_t color, uint32_t turn);
+
+void free_moves(struct move* moves, size_t move_number);
+
 #endif //BIT_BOARD_ALGORITHM_H

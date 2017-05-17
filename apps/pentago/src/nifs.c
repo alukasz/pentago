@@ -45,7 +45,7 @@ static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv
         case NEGAMAX:
             move = alg_negamax(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn);
             break;
-        case 2:
+        case NEGAMAX_AB_SORTED:
             move = alg_negamax_ab_sorted(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, -10000, 10000);
             break;
         case NEGAMAX_AB:
