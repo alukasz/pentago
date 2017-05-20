@@ -1,19 +1,19 @@
 #include "board.h"
 #include "algorithm.h"
 
-uint32_t board_get(struct board* board, char pos) {
+uint32_t board_get(struct board *board, char pos) {
     uint64_t mask = pos_mask[pos];
-    if(board->color[BLACK] & mask) return BLACK;
-    if(board->color[WHITE] & mask) return WHITE;
+    if (board->color[BLACK] & mask) return BLACK;
+    if (board->color[WHITE] & mask) return WHITE;
     return EMPTY;
 }
 
-void board_set(struct board* board, char pos, int color) {
+void board_set(struct board *board, char pos, int color) {
     board->color[color] |= pos_mask[pos];
 }
 
-struct board* board_move(struct board* board, struct move* move) {
-    struct board* new_board = malloc(sizeof(struct board));
+struct board *board_move(struct board *board, struct move *move) {
+    struct board *new_board = malloc(sizeof(struct board));
     memcpy(new_board, board, sizeof(struct board));
 
     new_board->color[move->color] |= pos_mask[move->pos];
@@ -29,7 +29,38 @@ struct board* board_move(struct board* board, struct move* move) {
     return new_board;
 }
 
-int board_winner(struct board* board) {
+inline uint64_t rotate_sub_board_cw(uint64_t b, int q) {
+    uint64_t m = 0xFFull << (q * 9);
+    return (b & ~m) | (((b & m) >> 6) & m) | (((b & m) << 2) & m);
+}
+
+inline uint64_t rotate_sub_board_ccw(uint64_t b, int q) {
+    uint64_t m = 0xFFull << (q * 9);
+    return (b & ~m) | (((b & m) >> 2) & m) | (((b & m) << 6) & m);
+}
+
+inline int bit_count(uint64_t n) {
+    int count = (n > 0);
+    if ((n &= (n - 1))) {
+        ++count;
+        if ((n &= (n - 1))) {
+            ++count;
+            if ((n &= (n - 1))) {
+                ++count;
+                if ((n &= (n - 1))) {
+                    ++count;
+                    if ((n & (n - 1))) {
+                        ++count;
+                    }
+                }
+            }
+        }
+    }
+
+    return count;
+}
+
+int board_winner(struct board *board) {
     uint32_t winner = 0;
     uint64_t black = board->color[BLACK], white = board->color[WHITE];
 
@@ -141,7 +172,7 @@ int board_winner(struct board* board) {
     }
 }
 
-int32_t board_evaluate(struct board* board, uint32_t color) {
+int32_t board_evaluate(struct board *board, uint32_t color) {
     int32_t points = 0;
     uint64_t b_wp, w_wp, black = board->color[BLACK], white = board->color[WHITE];
 
@@ -308,28 +339,169 @@ int32_t board_evaluate(struct board* board, uint32_t color) {
     return (color == BLACK ? points : -points);
 }
 
-inline uint64_t rotate_sub_board_cw(uint64_t b, int q) {
-    uint64_t m = 0xFFull << (q*9);
-    return (b & ~m) | (((b & m) >> 6) & m) | (((b & m) << 2) & m);
-}
+int32_t board_evaluate_in_row(struct board *board, uint32_t color) {
+    int32_t points = 0;
+    uint64_t b_wp, w_wp, black = board->color[BLACK], white = board->color[WHITE];
 
-inline uint64_t rotate_sub_board_ccw(uint64_t b, int q) {
-    uint64_t m = 0xFFull << (q*9);
-    return (b & ~m) | (((b & m) >> 2) & m) | (((b & m) << 6) & m);
-}
+    b_wp = black & 98311;
+    w_wp = white & 98311;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
 
-inline int bit_count(uint64_t n) {
-    int count = (n > 0);
-    if((n &= (n - 1))){ ++count;
-        if((n &= (n - 1))){ ++count;
-            if((n &= (n - 1))){ ++count;
-                if((n &= (n - 1))){ ++count;
-                    if((n & (n - 1))){ ++count;
-                    }
-                }
-            }
-        }
-    }
+    b_wp = black & 98822;
+    w_wp = white & 98822;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
 
-    return count;
+    b_wp = black & 147848;
+    w_wp = white & 147848;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 148744;
+    w_wp = white & 148744;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 12400;
+    w_wp = white & 12400;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 14384;
+    w_wp = white & 14384;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 1639972864;
+    w_wp = white & 1639972864;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 3783262208;
+    w_wp = white & 3783262208;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 34730934272;
+    w_wp = white & 34730934272;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 39023804416;
+    w_wp = white & 39023804416;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 17315921920;
+    w_wp = white & 17315921920;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 25904807936;
+    w_wp = white & 25904807936;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 6291649;
+    w_wp = white & 6291649;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 7340224;
+    w_wp = white & 7340224;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 75497762;
+    w_wp = white & 75497762;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 76022048;
+    w_wp = white & 76022048;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 50331676;
+    w_wp = white & 50331676;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 50593816;
+    w_wp = white & 50593816;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 805363712;
+    w_wp = white & 805363712;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 939548672;
+    w_wp = white & 939548672;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 35433680896;
+    w_wp = white & 35433680896;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 52613484544;
+    w_wp = white & 52613484544;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 6442454528;
+    w_wp = white & 6442454528;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 15032388608;
+    w_wp = white & 15032388608;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 34896609553;
+    w_wp = white & 34896609553;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 43486544144;
+    w_wp = white & 43486544144;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 17465082016;
+    w_wp = white & 17465082016;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 5368717322;
+    w_wp = white & 5368717322;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 84025856;
+    w_wp = white & 84025856;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 85073920;
+    w_wp = white & 85073920;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 10567696;
+    w_wp = white & 10567696;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    b_wp = black & 570954752;
+    w_wp = white & 570954752;
+    points += points_value[bit_count(b_wp)];
+    points -= points_value[bit_count(w_wp)];
+
+    return (color == BLACK ? points : -points);
 }

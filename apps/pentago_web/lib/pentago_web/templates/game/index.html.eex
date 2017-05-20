@@ -1,3 +1,12 @@
 <div id="app">
-  <pentago player1="<%= @player1 %>" player2="<%= @player2 %>" depth="<%= @depth %>"></pentago>
+  <pentago
+    player1="<%= @player1 %>"
+    player2="<%= @player2 %>"
+    eval1="<%= @eval1 %>"
+    eval2="<%= @eval2 %>"
+    mg1="<%= @mg1 %>"
+    mg2="<%= @mg2 %>"
+    depth1="<%= @depth1 %>"
+    depth2="<%= @depth2 %>">
+  </pentago>
 </div>

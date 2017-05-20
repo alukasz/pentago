@@ -78,7 +78,7 @@
         leafs: "0"
       }
     },
-    props: ['player1', 'player2', 'depth'],
+    props: ['player1', 'player2', 'eval1', 'eval2', 'mg1', 'mg2', 'depth1', 'depth2'],
     mounted() {
       socket.connect()
 
@@ -101,6 +101,7 @@
         this.time = +payload.time.toFixed(3)
         this.leafs = payload.leafs.toLocaleString()
         this.winner = payload.winner
+        this.turn = payload.turn
         this.checkEndingConditions()
         this.makeAIMove()
       })
@@ -122,7 +123,7 @@
         return !this.playing
       },
       disableRotate() {
-        return this.current_player != "human"
+        return this.current_player != 2
       }
     },
     methods: {
@@ -137,7 +138,12 @@
         channel.push("start_game", {
           player1: this.player1,
           player2: this.player2,
-          depth: this.depth
+          eval1: this.eval1,
+          eval2: this.eval2,
+          mg1: this.mg1,
+          mg2: this.mg2,
+          depth1: this.depth1,
+          depth2: this.depth2
         })
       },
       makeMove(sub_board, rotation) {
@@ -145,23 +151,21 @@
           return alert("choose where to put marble")
         }
         channel.push("make_move", {
-          player: this.current_player,
-          pos: this.selected_marble.split("-")[1],
+          pos: parseInt(this.selected_marble.split("-")[1]),
           color: this.current_color,
           sub_board: sub_board,
           rotation: rotation
         })
       },
       makeAIMove() {
-        if (this.current_player != "human" && (!this.is_finished)) {
+        if (this.current_player != 2 && (! this.is_finished)) {
           channel.push("make_move", {
-            player: this.current_player,
             color: this.current_color
           })
         }
       },
       checkEndingConditions() {
-        if (this.winner != empty || this.turn == 35) {
+        if (this.winner != empty || this.turn > 35) {
           this.is_finished = true
         }
       },
@@ -187,7 +191,7 @@
       },
       marbleDisabled(marble) {
         return marble != empty ||
-          this.current_player != "human" ||
+          this.current_player != 2 ||
           this.is_finished
       },
       row(move) {

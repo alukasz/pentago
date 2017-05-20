@@ -7,11 +7,11 @@ static ERL_NIF_TERM move(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[]) {
     struct move *move = malloc(sizeof(struct move));
     int pos, sub_board, rotation, color;
 
-    tuple_to_board(env, argv[ARGV_TUPLE], board);
-    enif_get_int(env, argv[ARGV_POS], &pos);
-    enif_get_int(env, argv[ARGV_COLOR], &color);
-    enif_get_int(env, argv[ARGV_SUB_BOARD], &sub_board);
-    enif_get_int(env, argv[ARGV_ROTATION], &rotation);
+    tuple_to_board(env, argv[0], board);
+    enif_get_int(env, argv[1], &pos);
+    enif_get_int(env, argv[2], &color);
+    enif_get_int(env, argv[3], &sub_board);
+    enif_get_int(env, argv[4], &rotation);
 
     move->pos = (uint8_t) pos;
     move->color = (uint8_t) color;
@@ -32,27 +32,47 @@ static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv
     board->color[BLACK] = 0ul;
     board->color[WHITE] = 0ul;
     struct move *move;
-    int algorithm,  color, depth, turn;
+    int algorithm, mg, eval, color, depth, turn;
 
-    tuple_to_board(env, argv[ARGV_TUPLE], board);
+    tuple_to_board(env, argv[0], board);
     enif_get_int(env, argv[1], &algorithm);
-    enif_get_int(env, argv[2], &color);
-    enif_get_int(env, argv[3], &depth);
-    enif_get_int(env, argv[4], &turn);
+    enif_get_int(env, argv[2], &eval);
+    enif_get_int(env, argv[3], &mg);
+    enif_get_int(env, argv[4], &color);
+    enif_get_int(env, argv[5], &depth);
+    enif_get_int(env, argv[6], &turn);
+
+    move_generator move_generator;
+    evaluation evaluation ;
+    switch (mg) {
+        case MOVE_GENERATOR_SORTED:
+            move_generator = get_available_moves_sorted;
+            break;
+        case MOVE_GENERATOR_DEFAULT:
+        default:
+            move_generator = get_available_moves;
+            break;
+    }
+
+    switch (eval) {
+        case EVALUATION_IN_ROW:
+            evaluation = board_evaluate_in_row;
+            break;
+        case EVALUATION_IN_ROW_BLOCK:
+        default:
+            evaluation = board_evaluate;
+            break;
+    }
 
     clock_t begin = clock();
     switch (algorithm) {
         case NEGAMAX:
-            move = alg_negamax(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn);
-            break;
-        case NEGAMAX_AB_SORTED:
-            move = alg_negamax_ab_sorted(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, -10000, 10000);
+            move = negamax(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, evaluation, move_generator);
             break;
         case NEGAMAX_AB:
         default:
-            move = alg_negamax_ab(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, -10000, 10000);
+            move = negamax_ab(board, (uint32_t) color, (uint32_t) depth, (uint32_t) turn, INT16_MIN, INT16_MAX, evaluation, move_generator);
             break;
-
     }
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -68,7 +88,7 @@ static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv
 
 static ErlNifFunc nif_funcs[] = {
         {"move", 5, move},
-        {"make_move", 5, make_move},
+        {"make_move", 7, make_move},
 };
 
 ERL_NIF_INIT(Elixir.Pentago.Game.BitBoard, nif_funcs, NULL, NULL, NULL, NULL)

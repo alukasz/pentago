@@ -3,52 +3,58 @@ defmodule Pentago.Game do
   alias Pentago.Game.BitBoard
 
   @name __MODULE__
-  @minimax 0
-  @alphabeta 1
-  @alphabeta_sorted 2
   @black 0
   @white 1
   @empty 2
+  @human 2
 
-  def start_link(player1, player2, depth) do
-    GenServer.start_link(@name, {player1, player2, depth}, name: @name)
+  def start_link(game_state) do
+    GenServer.start_link(@name, game_state, name: @name)
   end
 
   def close do
     GenServer.stop(@name, :shutdown)
   end
 
-  def init({player1, player2, depth}) do
-    board = Tuple.duplicate(@empty, 36)
-
-    {:ok, %{board: board, turn: 0, moves: [], player1: player1, player2: player2, depth: depth}}
+  def init(state) do
+    {:ok, state}
   end
 
   def make_move(move) do
     GenServer.call(@name, {:make_move, move}, 10_000_000)
   end
 
-  def handle_call({:make_move, %{player: :human} = move}, _from, state) do
+  def handle_call({:make_move, %{color: @black} = move}, _from, %{player1: @human} = state) do
     result = BitBoard.move(state.board, move.pos, move.color, move.sub_board, move.rotation)
 
     result(state, result)
   end
-
-  def handle_call({:make_move, %{player: :minimax} = move}, _from, state) do
-    result = BitBoard.make_move(state.board, @minimax, move.color, state.depth, state.turn)
-
-    IO.inspect(result)
-    result(state, result)
-  end
-
-  def handle_call({:make_move, %{player: :alphabeta} = move}, _from, state) do
-    result = BitBoard.make_move(state.board, @alphabeta, move.color, state.depth, state.turn)
+  def handle_call({:make_move, %{color: @white} = move}, _from, %{player2: @human} = state) do
+    result = BitBoard.move(state.board, move.pos, move.color, move.sub_board, move.rotation)
 
     result(state, result)
   end
+  def handle_call({:make_move, %{color: @black}}, _from, state) do
+    result = BitBoard.make_move(state.board,
+      state.player1,
+      state.eval1,
+      state.mg1,
+      @black,
+      state.depth1,
+      state.turn
+    )
 
-  def handle_call({:make_move, %{player: :ab_sorted} = move}, _from, state) do
-    result = BitBoard.make_move(state.board, @alphabeta_sorted, move.color, state.depth, state.turn)
+    result(state, result)
+  end
+  def handle_call({:make_move, %{color: @white}}, _from, state) do
+    result = BitBoard.make_move(state.board,
+      state.player2,
+      state.eval2,
+      state.mg2,
+      @white,
+      state.depth2,
+      state.turn
+    )
 
     result(state, result)
   end

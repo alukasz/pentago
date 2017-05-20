@@ -32,20 +32,23 @@ struct move {
     uint8_t sub_board;// : 4;
     uint8_t rotation;// : 2;
     int32_t points;
-    struct board* board;
 };
 
 struct board {
     uint64_t color[2];
 };
 
-struct board *board_move(struct board *board, struct move *move);
 uint32_t board_get(struct board* board, char pos);
 void board_set(struct board* board, char pos, int color);
-int board_winner(struct board* board);
-int32_t board_evaluate(struct board* board, uint32_t color);
+struct board *board_move(struct board *board, struct move *move);
 inline uint64_t rotate_sub_board_cw(uint64_t b, int q);
 inline uint64_t rotate_sub_board_ccw(uint64_t b, int q);
 inline int bit_count(uint64_t n);
+
+int board_winner(struct board* board);
+int32_t board_evaluate(struct board* board, uint32_t color);
+int32_t board_evaluate_in_row(struct board* board, uint32_t color);
+
+
 
 #endif //BIT_BOARD_BOARD_H
