@@ -10,6 +10,8 @@
 
 #define EVALUATION_IN_ROW_BLOCK 0
 #define EVALUATION_IN_ROW 1
+#define EVALUATION_BLOCK 2
+#define EVALUATION_STAIGHT_FIVE 3
 
 void tuple_to_board(ErlNifEnv *env, const ERL_NIF_TERM arg, struct board* board);
 void board_to_tuple(ErlNifEnv *env,  struct board* board, ERL_NIF_TERM* tuple);

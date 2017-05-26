@@ -58,4 +58,3 @@ defmodule Pentago.Web.GameChannel do
   end
 end
 
-

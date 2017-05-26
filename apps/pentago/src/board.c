@@ -339,6 +339,109 @@ int32_t board_evaluate(struct board *board, uint32_t color) {
     return (color == BLACK ? points : -points);
 }
 
+int32_t board_evaluate_block(struct board *board, uint32_t color) {
+    int32_t points = 0;
+    uint64_t black = board->color[BLACK], white = board->color[WHITE];
+
+    if ((black & 98311) == 98311) points -= 200;
+    if ((white & 98311) == 98311) points += 200;
+
+    if ((black & 98822) == 98822) points -= 200;
+    if ((white & 98822) == 98822) points += 200;
+
+    if ((black & 147848) == 147848) points -= 200;
+    if ((white & 147848) == 147848) points += 200;
+
+    if ((black & 148744) == 148744) points -= 200;
+    if ((white & 148744) == 148744) points += 200;
+
+    if ((black & 12400) == 12400) points -= 200;
+    if ((white & 12400) == 12400) points += 200;
+
+    if ((black & 14384) == 14384) points -= 200;
+    if ((white & 14384) == 14384) points += 200;
+
+    if ((black & 1639972864) == 1639972864) points -= 200;
+    if ((white & 1639972864) == 1639972864) points += 200;
+
+    if ((black & 3783262208) == 3783262208) points -= 200;
+    if ((white & 3783262208) == 3783262208) points += 200;
+
+    if ((black & 34730934272) == 34730934272) points -= 200;
+    if ((white & 34730934272) == 34730934272) points += 200;
+
+    if ((black & 39023804416) == 39023804416) points -= 200;
+    if ((white & 39023804416) == 39023804416) points += 200;
+
+    if ((black & 17315921920) == 17315921920) points -= 200;
+    if ((white & 17315921920) == 17315921920) points += 200;
+
+    if ((black & 25904807936) == 25904807936) points -= 200;
+    if ((white & 25904807936) == 25904807936) points += 200;
+
+    if ((black & 6291649) == 6291649) points -= 200;
+    if ((white & 6291649) == 6291649) points += 200;
+
+    if ((black & 7340224) == 7340224) points -= 200;
+    if ((white & 7340224) == 7340224) points += 200;
+
+    if ((black & 75497762) == 75497762) points -= 200;
+    if ((white & 75497762) == 75497762) points += 200;
+
+    if ((black & 76022048) == 76022048) points -= 200;
+    if ((white & 76022048) == 76022048) points += 200;
+
+    if ((black & 50331676) == 50331676) points -= 200;
+    if ((white & 50331676) == 50331676) points += 200;
+
+    if ((black & 50593816) == 50593816) points -= 200;
+    if ((white & 50593816) == 50593816) points += 200;
+
+    if ((black & 805363712) == 805363712) points -= 200;
+    if ((white & 805363712) == 805363712) points += 200;
+
+    if ((black & 939548672) == 939548672) points -= 200;
+    if ((white & 939548672) == 939548672) points += 200;
+
+    if ((black & 35433680896) == 35433680896) points -= 200;
+    if ((white & 35433680896) == 35433680896) points += 200;
+
+    if ((black & 52613484544) == 52613484544) points -= 200;
+    if ((white & 52613484544) == 52613484544) points += 200;
+
+    if ((black & 6442454528) == 6442454528) points -= 200;
+    if ((white & 6442454528) == 6442454528) points += 200;
+
+    if ((black & 15032388608) == 15032388608) points -= 200;
+    if ((white & 15032388608) == 15032388608) points += 200;
+
+    if ((black & 34896609553) == 34896609553) points -= 200;
+    if ((white & 34896609553) == 34896609553) points += 200;
+
+    if ((black & 43486544144) == 43486544144) points -= 200;
+    if ((white & 43486544144) == 43486544144) points += 200;
+
+    if ((black & 17465082016) == 17465082016) points -= 200;
+    if ((white & 17465082016) == 17465082016) points += 200;
+
+    if ((black & 5368717322) == 5368717322) points -= 200;
+    if ((white & 5368717322) == 5368717322) points += 200;
+
+    if ((black & 84025856) == 84025856) points -= 200;
+    if ((white & 84025856) == 84025856) points += 200;
+
+    if ((black & 85073920) == 85073920) points -= 200;
+    if ((white & 85073920) == 85073920) points += 200;
+
+    if ((black & 10567696) == 10567696) points -= 200;
+    if ((white & 10567696) == 10567696) points += 200;
+
+    if ((black & 570954752) == 570954752) points -= 200;
+    if ((white & 570954752) == 570954752) points += 200;
+
+    return (color == BLACK ? -points : points);
+}
+
 int32_t board_evaluate_in_row(struct board *board, uint32_t color) {
     int32_t points = 0;
     uint64_t b_wp, w_wp, black = board->color[BLACK], white = board->color[WHITE];
@@ -502,6 +605,115 @@ int32_t board_evaluate_in_row(struct board *board, uint32_t color) {
     w_wp = white & 570954752;
     points += points_value[bit_count(b_wp)];
     points -= points_value[bit_count(w_wp)];
+
+    return (color == BLACK ? points : -points);
+}
+
+int32_t board_evaluate_straight_five(struct board *board, uint32_t color) {
+    int32_t points = 0;
+    uint64_t black = board->color[BLACK];
+    uint64_t white = board->color[WHITE];
+    for (int i = 0; i < 16; ++i) {
+        uint64_t wp = three_in_rows[i];
+        if ((black & wp) == wp) points += 50;
+        if ((white & wp) == wp) points -= 50;
+    }
+
+    if ((black & 98311) == 98311) points += 200;
+    if ((white & 98311) == 98311) points -= 200;
+
+    if ((black & 98822) == 98822) points += 200;
+    if ((white & 98822) == 98822) points -= 200;
+
+    if ((black & 147848) == 147848) points += 200;
+    if ((white & 147848) == 147848) points -= 200;
+
+    if ((black & 148744) == 148744) points += 200;
+    if ((white & 148744) == 148744) points -= 200;
+
+    if ((black & 12400) == 12400) points += 200;
+    if ((white & 12400) == 12400) points -= 200;
+
+    if ((black & 14384) == 14384) points += 200;
+    if ((white & 14384) == 14384) points -= 200;
+
+    if ((black & 1639972864) == 1639972864) points += 200;
+    if ((white & 1639972864) == 1639972864) points -= 200;
+
+    if ((black & 3783262208) == 3783262208) points += 200;
+    if ((white & 3783262208) == 3783262208) points -= 200;
+
+    if ((black & 34730934272) == 34730934272) points += 200;
+    if ((white & 34730934272) == 34730934272) points -= 200;
+
+    if ((black & 39023804416) == 39023804416) points += 200;
+    if ((white & 39023804416) == 39023804416) points -= 200;
+
+    if ((black & 17315921920) == 17315921920) points += 200;
+    if ((white & 17315921920) == 17315921920) points -= 200;
+
+    if ((black & 25904807936) == 25904807936) points += 200;
+    if ((white & 25904807936) == 25904807936) points -= 200;
+
+    if ((black & 6291649) == 6291649) points += 200;
+    if ((white & 6291649) == 6291649) points -= 200;
+
+    if ((black & 7340224) == 7340224) points += 200;
+    if ((white & 7340224) == 7340224) points -= 200;
+
+    if ((black & 75497762) == 75497762) points += 200;
+    if ((white & 75497762) == 75497762) points -= 200;
+
+    if ((black & 76022048) == 76022048) points += 200;
+    if ((white & 76022048) == 76022048) points -= 200;
+
+    if ((black & 50331676) == 50331676) points += 200;
+    if ((white & 50331676) == 50331676) points -= 200;
+
+    if ((black & 50593816) == 50593816) points += 200;
+    if ((white & 50593816) == 50593816) points -= 200;
+
+    if ((black & 805363712) == 805363712) points += 200;
+    if ((white & 805363712) == 805363712) points -= 200;
+
+    if ((black & 939548672) == 939548672) points += 200;
+    if ((white & 939548672) == 939548672) points -= 200;
+
+    if ((black & 35433680896) == 35433680896) points += 200;
+    if ((white & 35433680896) == 35433680896) points -= 200;
+
+    if ((black & 52613484544) == 52613484544) points += 200;
+    if ((white & 52613484544) == 52613484544) points -= 200;
+
+    if ((black & 6442454528) == 6442454528) points += 200;
+    if ((white & 6442454528) == 6442454528) points -= 200;
+
+    if ((black & 15032388608) == 15032388608) points += 200;
+    if ((white & 15032388608) == 15032388608) points -= 200;
+
+    if ((black & 34896609553) == 34896609553) points += 200;
+    if ((white & 34896609553) == 34896609553) points -= 200;
+
+    if ((black & 43486544144) == 43486544144) points += 200;
+    if ((white & 43486544144) == 43486544144) points -= 200;
+
+    if ((black & 17465082016) == 17465082016) points += 200;
+    if ((white & 17465082016) == 17465082016) points -= 200;
+
+    if ((black & 5368717322) == 5368717322) points += 200;
+    if ((white & 5368717322) == 5368717322) points -= 200;
+
+    if ((black & 84025856) == 84025856) points += 200;
+    if ((white & 84025856) == 84025856) points -= 200;
+
+    if ((black & 85073920) == 85073920) points += 200;
+    if ((white & 85073920) == 85073920) points -= 200;
+
+    if ((black & 10567696) == 10567696) points += 200;
+    if ((white & 10567696) == 10567696) points -= 200;
+
+    if ((black & 570954752) == 570954752) points += 200;
+    if ((white & 570954752) == 570954752) points -= 200;
 
     return (color == BLACK ? points : -points);
 }

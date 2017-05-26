@@ -28,8 +28,10 @@
             <div class="form-group">
               <label>Evaluation</label>
               <select class="form-control" name="eval1">
-                <option value="0"<%= if @conn.params["eval1"] == "0" do %> selected<% end %>>In row + Block</option>
                 <option value="1"<%= if @conn.params["eval1"] == "1" do %> selected<% end %>>In row</option>
+                <option value="0"<%= if @conn.params["eval1"] == "0" do %> selected<% end %>>In row when clear</option>
+                <option value="2"<%= if @conn.params["eval1"] == "2" do %> selected<% end %>>5 in row</option>
+                <option value="3"<%= if @conn.params["eval1"] == "3" do %> selected<% end %>>Stright five</option>
               </select>
             </div>
             <div class="form-group">
@@ -64,8 +66,10 @@
             <div class="form-group">
               <label>Evaluation</label>
               <select class="form-control" name="eval2">
-                <option value="0"<%= if @conn.params["eval2"] == "0" do %> selected<% end %>>In row + Block</option>
                 <option value="1"<%= if @conn.params["eval2"] == "1" do %> selected<% end %>>In row</option>
+                <option value="0"<%= if @conn.params["eval2"] == "0" do %> selected<% end %>>In row when clear</option>
+                <option value="2"<%= if @conn.params["eval2"] == "2" do %> selected<% end %>>5 in row</option>
+                <option value="3"<%= if @conn.params["eval2"] == "3" do %> selected<% end %>>Stright five</option>
               </select>
             </div>
             <div class="form-group">

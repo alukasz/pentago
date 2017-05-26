@@ -55,6 +55,12 @@ static ERL_NIF_TERM make_move(ErlNifEnv *env, int argc, const ERL_NIF_TERM *argv
     }
 
     switch (eval) {
+        case EVALUATION_BLOCK:
+            evaluation = board_evaluate_block;
+            break;
+        case EVALUATION_STAIGHT_FIVE:
+            evaluation = board_evaluate_straight_five;
+            break;
         case EVALUATION_IN_ROW:
             evaluation = board_evaluate_in_row;
             break;

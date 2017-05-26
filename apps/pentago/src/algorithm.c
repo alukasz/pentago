@@ -8,9 +8,9 @@ struct move* negamax(struct board *board,
                      evaluation evaluation,
                      move_generator move_generator
 ) {
-    int32_t value, best_value = -10000;
+    int32_t value, best_value = -INT16_MIN;
     size_t move_number;
-    struct move* moves = move_generator(board, &move_number, color, turn);
+    struct move* moves = move_generator(board, &move_number, color, turn, evaluation);
     struct move* best_move = malloc(sizeof(struct move));
     *best_move = *moves;
 
@@ -34,17 +34,18 @@ int32_t negamax_rec(struct board *board,
                     uint32_t turn,
                     evaluation evaluation,
                     move_generator move_generator
-) {    ++nodes;
+) {
+    ++nodes;
     if (depth == 0 || board_winner(board) != EMPTY) {
         return evaluation(board, color);
     }
-    int32_t value, best_value = -10000;
+    int32_t value, best_value = INT16_MIN;
     size_t move_number;
     struct move* moves;
     if (depth > 1) {
-        moves = move_generator(board, &move_number, color, turn);
+        moves = move_generator(board, &move_number, color, turn, evaluation);
     } else {
-        moves = get_available_moves(board, &move_number, color, turn);
+        moves = get_available_moves(board, &move_number, color, turn, evaluation);
     }
     for (int i = 0; i < move_number; ++i) {
         struct board* new_board = board_move(board, (moves + i));
@@ -65,9 +66,9 @@ struct move* negamax_ab(struct board *board,
                      evaluation evaluation,
                      move_generator move_generator
 ) {
-    int32_t value, best_value = -10000;
+    int32_t value, best_value = INT16_MIN;
     size_t move_number;
-    struct move* moves = move_generator(board, &move_number, color, turn);
+    struct move* moves = move_generator(board, &move_number, color, turn, evaluation);
     struct move* best_move = malloc(sizeof(struct move));
     *best_move = *moves;
 
@@ -103,13 +104,13 @@ int32_t negamax_ab_rec(struct board *board,
     if (depth == 0 || board_winner(board) != EMPTY) {
         return evaluation(board, color);
     }
-    int32_t value, best_value = -10000;
+    int32_t value, best_value = INT16_MIN;
     size_t move_number;
     struct move* moves;
     if (depth > 1) {
-        moves = move_generator(board, &move_number, color, turn);
+        moves = move_generator(board, &move_number, color, turn, evaluation);
     } else {
-        moves = get_available_moves(board, &move_number, color, turn);
+        moves = get_available_moves(board, &move_number, color, turn, evaluation);
     }
 
     for (int i = 0; i < move_number; ++i) {
@@ -128,7 +129,7 @@ int32_t negamax_ab_rec(struct board *board,
     return best_value;
 }
 
-struct move *get_available_moves(struct board *board, size_t *move_number, uint32_t color, uint32_t turn) {
+struct move *get_available_moves(struct board *board, size_t *move_number, uint32_t color, uint32_t turn, evaluation evaluation) {
     uint64_t colors = board->color[BLACK] | board->color[WHITE];
     struct move *moves = calloc((TURNS + 2 - turn) * 8, sizeof(struct move));
     *move_number = 0;
@@ -155,12 +156,12 @@ struct move *get_available_moves(struct board *board, size_t *move_number, uint3
     return moves;
 }
 
-struct move *get_available_moves_sorted(struct board *board, size_t *move_number, uint32_t color, uint32_t turn) {
-    struct move *moves = get_available_moves(board, move_number, color, turn);
+struct move *get_available_moves_sorted(struct board *board, size_t *move_number, uint32_t color, uint32_t turn, evaluation evaluation) {
+    struct move *moves = get_available_moves(board, move_number, color, turn, evaluation);
 
     for (int i = 0; i < *move_number; ++i) {
         struct board *new_board = board_move(board, (moves + i));
-        (moves + i)->points = board_evaluate(new_board, color);
+        (moves + i)->points = evaluation(new_board, color);
         free(new_board);
     }
 
