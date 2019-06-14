@@ -22,4 +22,8 @@ defmodule Pentago.Web.GameController do
       depth1: depth1,
       depth2: depth2
   end
+
+  def live(conn, params) do
+    live_render conn, Pentago.Web.GameLive, session: params
+  end
 end

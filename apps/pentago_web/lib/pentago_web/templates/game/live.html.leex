@@ -1,0 +1,6 @@
+<div>
+  <div id="board">
+    <%= board(@board, @selected) %>
+    <%= for sub_board <- ["top_left", "top_right", "bottom_left", "bottom_right"], rotation <- ["clockwise", "counter_clockwise"], do: rotate_button(sub_board, rotation) %>
+  </div>
+</div>

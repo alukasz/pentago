@@ -16,11 +16,12 @@ defmodule Pentago.Board do
         rotation(move.rotation)
       )
 
-    %Board{board | marbles: from_nif_board(new_nif_board), winner: color(winner), moves_history: [move | board.moves_history]}
+    %Board{board | marbles: from_nif_board(new_nif_board), winner: color(winner),
+           moves_history: [move | board.moves_history]}
   end
 
-  defp to_nif_board(board) do
-    board.marbles
+  defp to_nif_board(%{marbles: marbles}) do
+    marbles
     |> Enum.map(&color/1)
     |> List.to_tuple()
   end

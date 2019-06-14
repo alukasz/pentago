@@ -1,5 +1,118 @@
 /* This file is for your main application css. */
 
+/* @import "../../../../deps/phoenix_live_view/assets/css/live_view.css"; */
+
 body {
   margin: 0 !important;
+}
+
+#board {
+  position: relative;
+  width: 400px;
+  margin: 50px auto;
+}
+.current-player {
+  display: inline-block;
+  vertical-align: middle;
+  height: 80px;
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.marble-row:nth-child(3) {
+  margin-bottom: 20px;
+}
+
+.marble {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  background-size: contain;
+  margin: 5px;
+  border: none;
+  cursor: default;
+}
+
+.marble:nth-child(3) {
+  margin-right: 20px;
+}
+
+.marble-black {
+  background-image: url(/images/marble-black.png);
+}
+
+.marble-white {
+  background-image: url(/images/marble-white.png);
+}
+
+.marble-empty {
+  background-image: url(/images/marble-empty.png);
+}
+
+.marble-empty:hover {
+  background-image: url(/images/marble-hover.png);
+  cursor: pointer;
+}
+
+.marble-selected, .marble-selected:hover {
+  background-image: url(/images/marble-selected.png);
+}
+
+.rotate {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  background-size: contain;
+  border: none;
+}
+
+.rotate-top_left-clockwise {
+  background-image: url(/images/rotate-0-c.png);
+  top: -50px;
+  left: 20px;
+}
+.rotate-top_left-counter_clockwise {
+  background-image: url(/images/rotate-0-cc.png);
+  top: 20px;
+  left: -50px;
+}
+
+.rotate-top_right-clockwise {
+  background-image: url(/images/rotate-1-c.png);
+  top: 20px;
+  right: -50px;
+}
+.rotate-top_right-counter_clockwise {
+  background-image: url(/images/rotate-1-cc.png);
+  top: -50px;
+  right: 20px;
+}
+
+.rotate-bottom_left-clockwise {
+  background-image: url(/images/rotate-2-c.png);
+  bottom: 20px;
+  left: -50px;
+}
+.rotate-bottom_left-counter_clockwise {
+  background-image: url(/images/rotate-2-cc.png);
+  bottom: -50px;
+  left: 20px;
+}
+
+.rotate-bottom_right-clockwise {
+  background-image: url(/images/rotate-3-c.png);
+  bottom: -50px;
+  right: 20px;
+}
+.rotate-bottom_right-counter_clockwise {
+  background-image: url(/images/rotate-3-cc.png);
+  bottom: 20px;
+  right: -50px;
+}
+
+.move-image {
+  height: 30px;
+  width: 30px;
 }
