@@ -22,6 +22,7 @@ defmodule Pentago.Web do
       import Plug.Conn
       import Pentago.Web.Router.Helpers
       import Pentago.Web.Gettext
+      import Phoenix.LiveView.Controller, only: [live_render: 3]
     end
   end
 
@@ -39,6 +40,7 @@ defmodule Pentago.Web do
       import Pentago.Web.Router.Helpers
       import Pentago.Web.ErrorHelpers
       import Pentago.Web.Gettext
+      import Phoenix.LiveView, only: [live_render: 2, live_render: 3]
     end
   end
 
@@ -47,6 +49,7 @@ defmodule Pentago.Web do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 
