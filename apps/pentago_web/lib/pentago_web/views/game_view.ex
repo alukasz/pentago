@@ -3,10 +3,13 @@ defmodule Pentago.Web.GameView do
 
   alias Pentago.Board
 
-  def board(%Board{marbles: marbles}, selected) do
+  def winner?(%Board{winner: :empty}), do: false
+  def winner?(_), do: true
+
+  def board(%Board{marbles: marbles} = b, selected) do
     marbles
     |> Enum.with_index()
-    |> Enum.chunk(6)
+    |> Enum.chunk_every(6)
     |> Enum.map(&board_row(&1, selected))
   end
 
@@ -18,7 +21,13 @@ defmodule Pentago.Web.GameView do
 
   defp marble({marble, position}, selected) when marble in [:black, :white, :empty] do
     class = Enum.join(["marble", color(marble), selected(position, selected)], " ")
-    content_tag(:div, nil, class: class, "phx-click": "select_marble", "phx-value": position)
+    action =
+      case marble do
+        :empty -> ["phx-click": "select_marble", "phx-value": position]
+        _ -> []
+      end
+
+    content_tag(:div, nil, [class: class] ++ action)
   end
 
   defp color(:black), do: "marble-black"

@@ -1,4 +1,4 @@
-defmodule Pentago.Game do
+defmodule Pentago.Game.Game do
   use GenServer
   alias Pentago.Game.BitBoard
 

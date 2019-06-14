@@ -4,7 +4,7 @@ defmodule Pentago.Board do
 
   @marbles Tuple.duplicate(:empty, 36) |> Tuple.to_list()
 
-  defstruct marbles: @marbles, winner: :nil, moves_history: []
+  defstruct marbles: @marbles, winner: :empty, moves_history: []
 
   def move(%Board{} = board, %Move{} = move) do
     {new_nif_board, _, _, _, _, winner, _, _} =

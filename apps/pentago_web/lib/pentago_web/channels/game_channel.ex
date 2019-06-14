@@ -1,7 +1,7 @@
 defmodule Pentago.Web.GameChannel do
   use Phoenix.Channel
   require Logger
-  alias Pentago.Game
+  alias Pentago.Game.Game
 
   def join("game", _message, socket) do
     Process.flag(:trap_exit, true)

@@ -10,12 +10,23 @@ defmodule Pentago.Web.GameLive do
   end
 
   def handle_event("select_marble", position, socket) do
-    IO.inspect String.to_integer(position)
-
     {:noreply, assign(socket, :selected, String.to_integer(position))}
   end
 
   def handle_event("make_move", rotation, socket) do
-    {:noreply, assign(socket, :selected, nil)}
+    move = build_move(socket.assigns.selected, rotation)
+    board = Pentago.Board.move(socket.assigns.board, move)
+
+    {:noreply, assign(socket, board: board, selected: nil)}
+  end
+
+  defp build_move(position, rotation) do
+    [sub_board, rotation] = String.split(rotation, "-")
+    %Pentago.Move{
+      marble: :black,
+      position: position,
+      sub_board: String.to_existing_atom(sub_board),
+      rotation: String.to_existing_atom(rotation)
+    }
   end
 end
