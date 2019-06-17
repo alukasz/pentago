@@ -10,10 +10,11 @@ defmodule Pentago.Application do
   use Application
 
   def start(_type, _args) do
-    import Supervisor.Spec, warn: false
+    children = [
+      Pentago.GameSupervisor,
+      {Registry, name: Pentago.GameRegistry, keys: :unique}
+    ]
 
-    Supervisor.start_link([
-
-    ], strategy: :one_for_one, name: Pentago.Supervisor)
+    Supervisor.start_link(children, strategy: :one_for_one, name: Pentago.Supervisor)
   end
 end

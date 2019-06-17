@@ -94,6 +94,7 @@
             <div class="form-group">
               <button type="submit" class="btn btn-default">Play</button>
             </div>
+            <%= button "Live", to: game_path(@conn, :create), class: "btn btn-success" %>
           </div>
         </form>
       </header>

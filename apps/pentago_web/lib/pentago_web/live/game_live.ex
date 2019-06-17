@@ -1,12 +1,14 @@
 defmodule Pentago.Web.GameLive do
   use Phoenix.LiveView
+  alias Pentago.Game
 
   def render(assigns) do
     Pentago.Web.GameView.render("live.html", assigns)
   end
 
-  def mount(session, socket) do
-    {:ok, assign(socket, board: %Pentago.Board{}, selected: nil)}
+  def mount(%{game_id: game_id}, socket) do
+    {:ok, game} = Game.join(game_id)
+    {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, game: game)}
   end
 
   def handle_event("select_marble", position, socket) do
