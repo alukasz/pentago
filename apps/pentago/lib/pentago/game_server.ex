@@ -62,25 +62,29 @@ defmodule Pentago.GameServer do
     {:stop, :players_disconnected, game}
   end
 
-  def waiting(:info, :maybe_terminate, %{player1: nil, player2: nil} = game) do
+  def waiting(:info, :maybe_terminate, _game) do
     :keep_state_and_data
   end
 
-  def waiting(:info, {:DOWN, _, _, pid, _}, game) do
-    disconnected(pid, game)
+  def waiting(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
+    Logger.debug "Player 1 #{inspect pid} disconnected"
+    maybe_terminate()
+    {:keep_state, %{game | player1: nil}}
   end
 
-  def playing(:info, {:DOWN, _, _, pid, _}, game) do
-    disconnected(pid, game)
+  def waiting(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
+    Logger.debug "Player 2 #{inspect pid} disconnected"
+    maybe_terminate()
+    {:keep_state, %{game | player2: nil}}
   end
 
-  defp disconnected(pid, %{player1: pid} = game) do
+  def playing(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
     Logger.debug "Player 1 #{inspect pid} disconnected"
     maybe_terminate()
     {:next_state, :waiting, %{game | player1: nil}}
   end
 
-  defp disconnected(pid, %{player2: pid} = game) do
+  def playing(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
     Logger.debug "Player 2 #{inspect pid} disconnected"
     maybe_terminate()
     {:next_state, :waiting, %{game | player2: nil}}

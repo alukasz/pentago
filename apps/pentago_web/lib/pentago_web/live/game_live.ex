@@ -7,13 +7,9 @@ defmodule Pentago.Web.GameLive do
   end
 
   def mount(%{game_id: game_id}, socket) do
-    case Game.join(game_id) do
-      {:ok, game} ->
-        {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, game: game)}
-      {:error, reason} ->
-        IO.inspect reason
-        {:ok, assign(socket, board: %Pentago.Board{}, selected: nil)}
-    end
+    Process.send_after(self, {:join, game_id}, 100)
+
+    {:ok, assign(socket, board: %Pentago.Board{}, selected: nil)}
   end
 
   def handle_event("select_marble", position, socket) do
@@ -25,6 +21,16 @@ defmodule Pentago.Web.GameLive do
     board = Pentago.Board.move(socket.assigns.board, move)
 
     {:noreply, assign(socket, board: board, selected: nil)}
+  end
+
+  def handle_info({:join, game_id}, socket) do
+    case Game.join(game_id) do
+      {:ok, game} ->
+        {:noreply, assign(socket, game: game)}
+      {:error, reason} ->
+        IO.inspect reason
+        {:noreply, socket}
+    end
   end
 
   defp build_move(position, rotation) do
