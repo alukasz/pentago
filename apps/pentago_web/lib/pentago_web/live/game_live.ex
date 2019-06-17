@@ -7,8 +7,13 @@ defmodule Pentago.Web.GameLive do
   end
 
   def mount(%{game_id: game_id}, socket) do
-    {:ok, game} = Game.join(game_id)
-    {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, game: game)}
+    case Game.join(game_id) do
+      {:ok, game} ->
+        {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, game: game)}
+      {:error, reason} ->
+        IO.inspect reason
+        {:ok, assign(socket, board: %Pentago.Board{}, selected: nil)}
+    end
   end
 
   def handle_event("select_marble", position, socket) do

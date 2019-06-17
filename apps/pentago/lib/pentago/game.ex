@@ -19,7 +19,7 @@ defmodule Pentago.Game do
   end
 
   def join(game) do
-    :gen_statem.call(name(game), {:join, self()})
+    :gen_statem.call(name(game), :join)
   end
 
   def name(%Game{id: id}), do: name(id)
