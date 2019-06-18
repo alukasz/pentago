@@ -7,7 +7,8 @@ defmodule Pentago.Web.GameLive do
     marble: :empty,
     selected: nil,
     make_move: false,
-    lock: "Loading..."
+    lock: "Loading...",
+    result: false
   }
 
   def render(assigns) do
@@ -64,6 +65,10 @@ defmodule Pentago.Web.GameLive do
 
   def handle_info({:board, board}, socket) do
     {:noreply, assign(socket, :board, board)}
+  end
+
+  def handle_info({:result, result}, socket) do
+    {:noreply, assign(socket, :result, result)}
   end
 
   defp build_move(marble, position, sub_board_rotation) do

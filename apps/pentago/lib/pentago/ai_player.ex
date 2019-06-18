@@ -35,8 +35,6 @@ defmodule Pentago.AIPlayer do
   end
 
   def handle_info(:make_move, state) do
-    IO.inspect "MAAAAAAAAKEEEEEEEEEe MOVEEEEEEEEE"
-    IO.inspect binding()
     %{game_id: game_id, depth: depth, marble: marble, board: board} = state
     move = Board.generate_move(state.board, state.marble, state.depth)
     Game.move(game_id, move)
@@ -45,7 +43,10 @@ defmodule Pentago.AIPlayer do
   end
 
   def handle_info({:board, board}, state) do
-    IO.inspect "BBBBBBBBBBOOOOOOOOOOOAAAAAAAARRRRRRDDDDDD"
     {:noreply, %{state | board: board}}
+  end
+
+  def handle_info({:result, _}, state) do
+    {:noreply, state}
   end
 end

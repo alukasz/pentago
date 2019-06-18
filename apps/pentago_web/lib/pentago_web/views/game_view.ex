@@ -3,14 +3,10 @@ defmodule Pentago.Web.GameView do
 
   alias Pentago.Board
 
-  def finished?(%Board{moves_history: history}) when length(history) == 36, do: true
-  def finished?(%Board{winner: :empty}), do: false
-  def finished?(_), do: true
-
-  def winner_message(%Board{winner: marble}, marble), do: "You won!"
-  def winner_message(%Board{winner: :empty}, _), do: "Draw"
-  def winner_message(%Board{winner: :draw}, _), do: "Draw"
-  def winner_message(%Board{winner: _}, _), do: "Second place"
+  def result_message(:won), do: "You won!"
+  def result_message(:lost), do: "Second place"
+  def result_message(:empty), do: "No winner"
+  def result_message(:draw), do: "Draw"
 
   def player_color(:empty), do: ""
 

@@ -85,10 +85,16 @@ defmodule Pentago.GameServer do
 
   def playing(:cast, {:move, move}, game) do
     board = Board.move(game.board, move)
-    game = %{game | board: board, current_player: next_player(game.current_player)}
+    game = %{game | board: board}
     update_board(game)
+    case result(game) do
+      :nope ->
+        {:repeat_state, %{game | current_player: opposite_player(game.current_player)}}
 
-    {:repeat_state, game}
+      result ->
+        notify_result(game, result)
+        {:keep_state, game}
+    end
   end
 
   # handle player disconnecting when playing
@@ -118,11 +124,56 @@ defmodule Pentago.GameServer do
     {:keep_state, game, [reply]}
   end
 
+  defp result(%{board: %{winner: winner, moves_history: history}} = game) do
+    cond do
+      winner == :draw ->
+        :draw
+
+      length(history) == 36 and winner == :empty ->
+        :empty
+
+      winner in [:black, :white] ->
+        winner
+
+      true -> :nope
+    end
+  end
+
+  defp notify_result(%{player1: player1, player2: player2} = game, result) do
+    case result do
+      :draw ->
+        send_result(game, :draw)
+
+      :empty ->
+        send_result(game, :empty)
+
+      :black ->
+        send_result(player1, :won)
+        send_result(player2, :lost)
+
+      :white ->
+        send_result(player1, :lost)
+        send_result(player2, :won)
+    end
+  end
+
   defp player_color(:player1), do: :black
   defp player_color(:player2), do: :white
 
-  defp next_player(:player1), do: :player2
-  defp next_player(:player2), do: :player1
+  defp opposite_player(:player1), do: :player2
+  defp opposite_player(:player2), do: :player1
+
+  defp player(:black), do: :player1
+  defp player(:white), do: :player2
+
+  def finished?(%Board{moves_history: history}) when length(history) == 36, do: true
+  def finished?(%Board{winner: :empty}), do: false
+  def finished?(_), do: true
+
+  def winner_message(%Board{winner: marble}, marble), do: "You won!"
+  def winner_message(%Board{winner: :empty}, _), do: "Draw"
+  def winner_message(%Board{winner: :draw}, _), do: "Draw"
+  def winner_message(%Board{winner: _}, _), do: "Second place"
 
   # schedule helpers
 
@@ -136,16 +187,20 @@ defmodule Pentago.GameServer do
 
   # updating live view helpers
 
-  defp lock_board(game, message) do
-    send_live(game, {:lock, message})
+  defp lock_board(game_or_pid, message) do
+    send_live(game_or_pid, {:lock, message})
   end
 
-  defp ask_for_move(pid) do
+  defp ask_for_move(pid) when is_pid(pid) do
     send_live(pid, :make_move)
   end
 
   defp update_board(%{board: board} = game) do
     send_live(game, {:board, board})
+  end
+
+  defp send_result(game_or_pid, result) do
+    send_live(game_or_pid, {:result, result})
   end
 
   defp send_live(%Game{player1: pid1, player2: pid2}, message) do
