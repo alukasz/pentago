@@ -12,7 +12,6 @@ defmodule Pentago.Web.GameView do
   def winner_message(%Board{winner: :draw}, _), do: "Draw"
   def winner_message(%Board{winner: _}, _), do: "Second place"
 
-
   def player_color(:empty), do: ""
 
   def player_color(color) do
@@ -25,7 +24,7 @@ defmodule Pentago.Web.GameView do
     end
   end
 
-  def board(%Board{marbles: marbles} = b, selected) do
+  def board(%Board{marbles: marbles}, selected) do
     marbles
     |> Enum.with_index()
     |> Enum.chunk_every(6)

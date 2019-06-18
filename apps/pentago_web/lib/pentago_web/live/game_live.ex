@@ -7,7 +7,7 @@ defmodule Pentago.Web.GameLive do
     marble: :empty,
     selected: nil,
     make_move: false,
-    lock: nil
+    lock: "Loading..."
   }
 
   def render(assigns) do
@@ -15,15 +15,12 @@ defmodule Pentago.Web.GameLive do
   end
 
   def mount(%{game_id: game_id}, socket) do
-    lock =
-      if Game.exists?(game_id) do
-        send(self, {:join, game_id})
-        "Loading"
-      else
-        "Game does not exists"
-      end
-
-    {:ok, assign(socket, Map.put(@default_assigns, :lock, lock))}
+    if Game.exists?(game_id) do
+      send(self(), {:join, game_id})
+      {:ok, assign(socket, @default_assigns)}
+    else
+      {:ok, assign(socket, Map.put(@default_assigns, :lock, "Game does not exists"))}
+    end
   end
 
   def handle_event("select_marble", position, socket) do

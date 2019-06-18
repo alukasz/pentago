@@ -12,9 +12,23 @@ defmodule Pentago.Game do
     board: %Board{},
   ]
 
+  def start_link(%Game{} = game) do
+    :gen_statem.start_link(name(game), GameServer, game, [])
+  end
+
+  def child_spec(args) do
+    %{
+      id: Game,
+      start: {Game, :start_link, [args]},
+      restart: :temporary,
+      type: :worker
+    }
+  end
+
+
   def create do
     game = %__MODULE__{id: generate_id()}
-    {:ok, _} = DynamicSupervisor.start_child(Pentago.GameSupervisor, {GameServer, game})
+    {:ok, _} = DynamicSupervisor.start_child(Pentago.GameSupervisor, {Game, game})
 
     {:ok, game}
   end
@@ -36,8 +50,8 @@ defmodule Pentago.Game do
     :gen_statem.cast(name(game), {:move, move})
   end
 
-  def name(%Game{id: id}), do: name(id)
-  def name(id), do: {:via, Registry, {Pentago.GameRegistry, id}}
+  defp name(%Game{id: id}), do: name(id)
+  defp name(id), do: {:via, Registry, {Pentago.GameRegistry, id}}
 
   defp generate_id do
     :crypto.strong_rand_bytes(6)

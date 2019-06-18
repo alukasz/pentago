@@ -6,19 +6,6 @@ defmodule Pentago.GameServer do
   alias Pentago.Game
   alias Pentago.Board
 
-  def start_link(%Game{} = game) do
-    :gen_statem.start_link(Game.name(game), __MODULE__, game, [])
-  end
-
-  def child_spec(args) do
-    %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [args]},
-      restart: :temporary,
-      type: :worker
-    }
-  end
-
   def init(game) do
     Logger.debug "creating game #{game.id}"
     {:ok, :waiting, game}
@@ -30,7 +17,7 @@ defmodule Pentago.GameServer do
 
   # :waiting callbacks
 
-  def waiting(:enter, _, game) do
+  def waiting(:enter, _, _game) do
     :keep_state_and_data
   end
 
@@ -64,6 +51,22 @@ defmodule Pentago.GameServer do
     :keep_state_and_data
   end
 
+  # handle player disconnecting
+
+  def waiting(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
+    Logger.debug "Player 1 #{inspect pid} disconnected"
+    lock_board(game, "Waiting for player 1 to reconnect")
+    maybe_terminate()
+    {:keep_state, %{game | player1: nil}}
+  end
+
+  def waiting(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
+    Logger.debug "Player 2 #{inspect pid} disconnected"
+    lock_board(game, "Waiting for player 2 to reconnect")
+    maybe_terminate()
+    {:keep_state, %{game | player2: nil}}
+  end
+
   # :playing callbacks
 
   def playing(:enter, _, game) do
@@ -88,21 +91,7 @@ defmodule Pentago.GameServer do
     {:repeat_state, game}
   end
 
-  # handle player disconnecting
-
-  def waiting(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
-    Logger.debug "Player 1 #{inspect pid} disconnected"
-    lock_board(game, "Waiting for player 1 to reconnect")
-    maybe_terminate()
-    {:keep_state, %{game | player1: nil}}
-  end
-
-  def waiting(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
-    Logger.debug "Player 2 #{inspect pid} disconnected"
-    lock_board(game, "Waiting for player 2 to reconnect")
-    maybe_terminate()
-    {:keep_state, %{game | player2: nil}}
-  end
+  # handle player disconnecting when playing
 
   def playing(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
     Logger.debug "Player 1 #{inspect pid} disconnected"
