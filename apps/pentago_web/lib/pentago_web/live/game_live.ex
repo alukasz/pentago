@@ -7,36 +7,52 @@ defmodule Pentago.Web.GameLive do
   end
 
   def mount(%{game_id: game_id}, socket) do
-    Process.send_after(self, {:join, game_id}, 100)
-
-    {:ok, assign(socket, board: %Pentago.Board{}, selected: nil)}
+    if Game.exists?(game_id) do
+      Process.send_after(self, {:join, game_id}, 100)
+      {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, make_move: false, lock: "Waiting for player 2 to join", marble: nil)}
+    else
+      {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, make_move: false, lock: "Game does not exists")}
+    end
   end
 
   def handle_event("select_marble", position, socket) do
     {:noreply, assign(socket, :selected, String.to_integer(position))}
   end
 
-  def handle_event("make_move", rotation, socket) do
-    move = build_move(socket.assigns.selected, rotation)
-    board = Pentago.Board.move(socket.assigns.board, move)
+  def handle_event("make_move", sub_board_rotation, socket) do
+    %{marble: marble, selected: selected} = socket.assigns
+    move = build_move(marble, selected, sub_board_rotation)
+    Game.move(socket.assigns.game_id, move)
 
-    {:noreply, assign(socket, board: board, selected: nil)}
+    {:noreply, assign(socket, selected: nil, make_move: false)}
   end
 
   def handle_info({:join, game_id}, socket) do
     case Game.join(game_id) do
-      {:ok, game} ->
-        {:noreply, assign(socket, game: game)}
+      {:ok, {board, marble}} ->
+        {:noreply, assign(socket, game_id: game_id, board: board, marble: marble)}
       {:error, reason} ->
         IO.inspect reason
         {:noreply, socket}
     end
   end
 
-  defp build_move(position, rotation) do
-    [sub_board, rotation] = String.split(rotation, "-")
+  def handle_info({:lock, message}, socket) do
+    {:noreply, assign(socket, :lock, message)}
+  end
+
+  def handle_info(:make_move, socket) do
+    {:noreply, assign(socket, lock: false, make_move: true)}
+  end
+
+  def handle_info({:board, board}, socket) do
+    {:noreply, assign(socket, :board, board)}
+  end
+
+  defp build_move(marble, position, sub_board_rotation) do
+    [sub_board, rotation] = String.split(sub_board_rotation, "-")
     %Pentago.Move{
-      marble: :black,
+      marble: marble,
       position: position,
       sub_board: String.to_existing_atom(sub_board),
       rotation: String.to_existing_atom(rotation)

@@ -116,3 +116,18 @@ body {
   height: 30px;
   width: 30px;
 }
+
+.lock {
+  background:rgba(255,255,255,0.5);
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+
+.lock p {
+  font-size: 20pt;
+  text-align: center;
+  margin-top: 50px;
+}
