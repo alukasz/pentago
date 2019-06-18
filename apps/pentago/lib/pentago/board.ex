@@ -3,7 +3,10 @@ defmodule Pentago.Board do
   alias Pentago.Move
   alias Pentago.Game.BitBoard
 
-  @marbles Tuple.duplicate(:empty, 36) |> Tuple.to_list()
+  @algorithm_negamax_ab 1
+  @evaluation_in_row_block 1
+  @move_generator_sorted 1
+  @marbles List.duplicate(:empty, 36)
 
   defstruct marbles: @marbles, winner: :empty, moves_history: []
 
@@ -19,6 +22,26 @@ defmodule Pentago.Board do
 
     %Board{board | marbles: from_nif_board(new_nif_board), winner: color(winner),
            moves_history: [move | board.moves_history]}
+  end
+
+  def generate_move(%Board{} = board, marble, depth \\ 2) do
+    {_, position, _, sub_board, rotation, _, _, _} =
+      BitBoard.make_move(
+        to_nif_board(board),
+        @algorithm_negamax_ab,
+        @evaluation_in_row_block,
+        @move_generator_sorted,
+        color(marble),
+        depth,
+        length(board.moves_history)
+      )
+
+    %Move{
+      marble: marble,
+      position: position,
+      sub_board: sub_board(sub_board),
+      rotation: rotation(rotation)
+    }
   end
 
   defp to_nif_board(%{marbles: marbles}) do

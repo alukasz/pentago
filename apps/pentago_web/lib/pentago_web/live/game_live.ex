@@ -14,9 +14,10 @@ defmodule Pentago.Web.GameLive do
     Pentago.Web.GameView.render("show.html", assigns)
   end
 
-  def mount(%{game_id: game_id}, socket) do
+  def mount(%{game_id: game_id, ai: ai}, socket) do
     if Game.exists?(game_id) do
       send(self(), {:join, game_id})
+      send(self(), {:start_ai, ai})
       {:ok, assign(socket, @default_assigns)}
     else
       {:ok, assign(socket, Map.put(@default_assigns, :lock, "Game does not exists"))}
@@ -42,6 +43,15 @@ defmodule Pentago.Web.GameLive do
       {:error, reason} ->
         {:noreply, assign(socket, :lock, reason)}
     end
+  end
+
+  def handle_info({:start_ai, nil}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_info({:start_ai, ai}, socket) do
+    {:ok, _} = Pentago.AIPlayer.start_link([game_id: socket.assigns.game_id, ai: ai])
+    {:noreply, socket}
   end
 
   def handle_info({:lock, message}, socket) do

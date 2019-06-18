@@ -1,7 +1,4 @@
 defmodule Pentago.Game.BitBoard do
-  @moduledoc """
-  Game logic.
-  """
   @on_load :load_nifs
 
   def load_nifs do
@@ -12,7 +9,7 @@ defmodule Pentago.Game.BitBoard do
     raise "NIF move/5 not implemented"
   end
 
-  def make_move(_board, _pos, _color, _sub_board, _rotation, _evaluation, _move_generator) do
-    raise "NIF next_move/7 not implemented"
+  def make_move(_board, _algorithm, _evaluation, _move_generator, _marble, _depth, _move_number) do
+    raise "NIF make_move/7 not implemented"
   end
 end
