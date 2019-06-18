@@ -2,20 +2,28 @@ defmodule Pentago.Web.GameLive do
   use Phoenix.LiveView
   alias Pentago.Game
 
+  @default_assigns %{
+    board: %Pentago.Board{},
+    marble: :empty,
+    selected: nil,
+    make_move: false,
+    lock: nil
+  }
+
   def render(assigns) do
-    Pentago.Web.GameView.render("live.html", assigns)
+    Pentago.Web.GameView.render("show.html", assigns)
   end
 
   def mount(%{game_id: game_id}, socket) do
     lock =
       if Game.exists?(game_id) do
-        Process.send_after(self, {:join, game_id}, 100)
-        "Waiting for player 2"
+        send(self, {:join, game_id})
+        "Loading"
       else
         "Game does not exists"
       end
 
-    {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, make_move: false, lock: lock, marble: :empty)}
+    {:ok, assign(socket, Map.put(@default_assigns, :lock, lock))}
   end
 
   def handle_event("select_marble", position, socket) do
@@ -33,15 +41,14 @@ defmodule Pentago.Web.GameLive do
   def handle_info({:join, game_id}, socket) do
     case Game.join(game_id) do
       {:ok, {board, marble}} ->
-        {:noreply, assign(socket, game_id: game_id, board: board, marble: marble)}
+        {:noreply, assign(socket, game_id: game_id, board: board, marble: marble, lock: "Waiting for second player")}
       {:error, reason} ->
-        IO.inspect reason
-        {:noreply, socket}
+        {:noreply, assign(socket, :lock, reason)}
     end
   end
 
   def handle_info({:lock, message}, socket) do
-    {:noreply, assign(socket, :lock, message)}
+    {:noreply, assign(socket, lock: message, make_move: false)}
   end
 
   def handle_info(:make_move, socket) do

@@ -38,7 +38,7 @@ defmodule Pentago.Board do
   def color(0), do: :black
   def color(1), do: :white
   def color(2), do: :empty
-  def color(3), do: :empty
+  def color(3), do: :draw
 
   def sub_board(:top_left), do: 0
   def sub_board(:top_right), do: 1
