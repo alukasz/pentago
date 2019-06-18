@@ -1,11 +1,6 @@
 import "phoenix_html"
 
-import Vue from "vue"
-import Pentago from "./components/pentago.vue"
+import LiveSocket from "phoenix_live_view"
 
-new Vue({
-  el: "#app",
-  components: {
-    Pentago
-  }
-})
+let liveSocket = new LiveSocket("/live")
+liveSocket.connect()

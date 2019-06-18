@@ -14,8 +14,12 @@ config :pentago_web, Pentago.Web.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "33g+LdE/mvFTHyDqVQ79YYuUEpUcaF9TfAlZh3tf/e+OB5hkrvww5sEh6Jjv/jCK",
   render_errors: [view: Pentago.Web.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Pentago.Web.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Pentago.Web.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [
+    signing_salt: "RQvXohxbvuutBcaleUfeUWpDdjp9hjsm"
+  ]
+
+config :phoenix, :json_library, Jason
 
 # Configures Elixir's Logger
 config :logger, :console,

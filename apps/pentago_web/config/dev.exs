@@ -37,7 +37,8 @@ config :pentago_web, Pentago.Web.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/pentago_web/views/.*(ex)$},
-      ~r{lib/pentago_web/templates/.*(eex)$}
+      ~r{lib/pentago_web/templates/.*(eex)$},
+      ~r{lib/pentago_web/live/.*(ex)$}
     ]
   ]
 

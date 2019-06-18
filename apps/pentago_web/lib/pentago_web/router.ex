@@ -7,6 +7,7 @@ defmodule Pentago.Web.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug Phoenix.LiveView.Flash
   end
 
   pipeline :api do
@@ -18,7 +19,7 @@ defmodule Pentago.Web.Router do
 
     get "/", PageController, :index
 
-    get "/game", GameController, :index
+    resources "/game", GameController, only: [:create, :show]
   end
 
   # Other scopes may use custom stacks.

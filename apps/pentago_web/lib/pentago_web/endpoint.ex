@@ -1,7 +1,11 @@
 defmodule Pentago.Web.Endpoint do
   use Phoenix.Endpoint, otp_app: :pentago_web
 
-  socket "/socket", Pentago.Web.UserSocket
+  socket "/socket", Pentago.Web.UserSocket,
+    websocket: true,
+    longpool: false
+
+  socket "/live", Phoenix.LiveView.Socket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -25,7 +29,7 @@ defmodule Pentago.Web.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: Jason
 
   plug Plug.MethodOverride
   plug Plug.Head

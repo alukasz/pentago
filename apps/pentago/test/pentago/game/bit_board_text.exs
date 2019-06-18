@@ -1,4 +1,4 @@
-defmodule Pentago.Game.FastBoardTest do
+defmodule Pentago.Game.BitBoardTest do
   use ExUnit.Case, async: true
   alias Pentago.Game.BitBoard
 

@@ -1,0 +1,16 @@
+<div>
+  <%= player_color(@marble) %>
+  <div id="board">
+    <%= board(@board, @selected) %>
+
+    <%= cond do
+      finished?(@board) -> lock_board(winner_message(@board, @marble))
+      @lock -> lock_board(@lock)
+      true -> ""
+    end %>
+
+    <%= if @make_move and not finished?(@board) do %>
+      <%= for sub_board <- ["top_left", "top_right", "bottom_left", "bottom_right"], rotation <- ["clockwise", "counter_clockwise"], do: rotate_button(sub_board, rotation) %>
+    <% end %>
+  </div>
+</div>
