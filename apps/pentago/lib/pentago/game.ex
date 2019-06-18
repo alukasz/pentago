@@ -25,7 +25,6 @@ defmodule Pentago.Game do
     }
   end
 
-
   def create do
     game = %__MODULE__{id: generate_id()}
     {:ok, _} = DynamicSupervisor.start_child(Pentago.GameSupervisor, {Game, game})

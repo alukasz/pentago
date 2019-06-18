@@ -48,10 +48,6 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/vendor/]
-    },
-    vue: {
-      extractCSS: true,
-      out: '../priv/static/css/components.css'
     }
   },
 
@@ -63,9 +59,6 @@ exports.config = {
 
   npm: {
     enabled: true,
-    whitelist: ["phoenix", "phoenix_html", "vue"],
-    aliases: {
-      vue: 'vue/dist/vue.common.js'
-    }
+    whitelist: ["phoenix", "phoenix_html"]
   }
 };

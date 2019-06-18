@@ -16,7 +16,6 @@
     <div class="container">
       <header class="header">
         <%= button "Live", to: game_path(@conn, :create), class: "btn btn-success" %>
-        <%= link "Vue", to: game_path(@conn, :index), class: "btn btn-info" %>
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
