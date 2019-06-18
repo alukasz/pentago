@@ -1,6 +1,7 @@
 defmodule Pentago.Board do
   alias Pentago.Board
   alias Pentago.Move
+  alias Pentago.Game.BitBoard
 
   @marbles Tuple.duplicate(:empty, 36) |> Tuple.to_list()
 
@@ -8,7 +9,7 @@ defmodule Pentago.Board do
 
   def move(%Board{} = board, %Move{} = move) do
     {new_nif_board, _, _, _, _, winner, _, _} =
-      Pentago.Game.BitBoard.move(
+      BitBoard.move(
         to_nif_board(board),
         move.position,
         color(move.marble),
