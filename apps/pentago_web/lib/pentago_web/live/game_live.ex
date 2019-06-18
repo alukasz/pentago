@@ -7,12 +7,15 @@ defmodule Pentago.Web.GameLive do
   end
 
   def mount(%{game_id: game_id}, socket) do
-    if Game.exists?(game_id) do
-      Process.send_after(self, {:join, game_id}, 100)
-      {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, make_move: false, lock: "Waiting for player 2 to join", marble: nil)}
-    else
-      {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, make_move: false, lock: "Game does not exists")}
-    end
+    lock =
+      if Game.exists?(game_id) do
+        Process.send_after(self, {:join, game_id}, 100)
+        "Waiting for player 2"
+      else
+        "Game does not exists"
+      end
+
+    {:ok, assign(socket, board: %Pentago.Board{}, selected: nil, make_move: false, lock: lock, marble: :empty)}
   end
 
   def handle_event("select_marble", position, socket) do

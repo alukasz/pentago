@@ -25,10 +25,6 @@ defmodule Pentago.Web.GameController do
       depth2: depth2
   end
 
-  def live(conn, params) do
-    live_render conn, Pentago.Web.GameLive, session: params
-  end
-
   def create(conn, _) do
     {:ok, %Game{id: id}} = Game.create()
 
