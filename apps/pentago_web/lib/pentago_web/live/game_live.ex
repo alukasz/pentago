@@ -39,8 +39,8 @@ defmodule Pentago.Web.GameLive do
 
   def handle_info({:join, game_id}, socket) do
     case Game.join(game_id) do
-      {:ok, {board, marble}} ->
-        {:noreply, assign(socket, game_id: game_id, board: board, marble: marble, lock: "Waiting for second player")}
+      {:ok, marble} ->
+        {:noreply, assign(socket, game_id: game_id, marble: marble, lock: "Waiting for other player")}
       {:error, reason} ->
         {:noreply, assign(socket, :lock, reason)}
     end

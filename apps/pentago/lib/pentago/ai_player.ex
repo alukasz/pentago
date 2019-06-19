@@ -23,8 +23,8 @@ defmodule Pentago.AIPlayer do
 
   def handle_info(:join, %{game_id: game_id} = state) do
     case Game.join(game_id) do
-      {:ok, {board, marble}} ->
-        {:noreply, %{state | board: board, marble: marble}}
+      {:ok, marble} ->
+        {:noreply, %{state | marble: marble}}
       {:error, reason} ->
         {:stop, :failed_to_join, state}
     end

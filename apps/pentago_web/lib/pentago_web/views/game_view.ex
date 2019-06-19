@@ -5,7 +5,7 @@ defmodule Pentago.Web.GameView do
 
   def result_message(:won), do: "You won!"
   def result_message(:lost), do: "Second place"
-  def result_message(:empty), do: "No winner"
+  def result_message(:no_winner), do: "No winner"
   def result_message(:draw), do: "Draw"
 
   def player_color(:empty), do: ""

@@ -47,6 +47,21 @@ defmodule Pentago.Board do
     }
   end
 
+  def winner(%Board{winner: winner, moves_history: history}) do
+    cond do
+      winner == :draw ->
+        :draw
+
+      length(history) == 36 and winner == :empty ->
+        :no_winner
+
+      winner in [:black, :white] ->
+        winner
+
+      true -> :in_progress
+    end
+  end
+
   defp to_nif_board(%{marbles: marbles}) do
     marbles
     |> Enum.map(&color/1)

@@ -28,58 +28,41 @@ defmodule Pentago.GameServer do
     join(game, :player2, from)
   end
 
-  def waiting({:call, {pid, _} = from}, :join, game) do
-    {:keep_state_and_data, [{:reply, from, {:error, :game_full}}]}
-  end
-
   def waiting(:info, :start_game, %{player1: nil}), do: :keep_state_and_data
   def waiting(:info, :start_game, %{player2: nil}), do: :keep_state_and_data
   def waiting(:info, :start_game, game), do: {:next_state, :playing, game}
 
-  def waiting(:info, :terminate, %{player1: nil, player2: nil} = game) do
+  def waiting(:info, {:DOWN, _, _, _, _}, game) do
     {:stop, :players_disconnected, game}
-  end
-
-  def waiting(:info, :terminate, _game) do
-    :keep_state_and_data
-  end
-
-  # handle player disconnecting
-
-  def waiting(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
-    lock_board(game, "Waiting for player 1 to reconnect")
-    terminate()
-    {:keep_state, %{game | player1: nil}}
-  end
-
-  def waiting(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
-    lock_board(game, "Waiting for player 2 to reconnect")
-    terminate()
-    {:keep_state, %{game | player2: nil}}
   end
 
   # :playing callbacks
 
-  def playing(:enter, _, game) do
-    case game.current_player do
-      :player1 ->
-        lock_board(game.player2, "Player 1 is making move")
-        ask_for_move(game.player1)
+  def playing(:enter, _, %{current_player: :player1} = game) do
+    lock_board(game.player2, "Player 1 is making move")
+    ask_for_move(game.player1)
 
-      :player2 ->
-        lock_board(game.player1, "Player 2 is making move")
-        ask_for_move(game.player2)
-    end
     :keep_state_and_data
   end
 
+  def playing(:enter, _, %{current_player: :player2} = game) do
+    lock_board(game.player1, "Player 2 is making move")
+    ask_for_move(game.player2)
+
+    :keep_state_and_data
+  end
+
+  def playing({:call, from}, :join, game) do
+    {:keep_state_and_data, [{:reply, from, {:error, "Game full"}}]}
+  end
+
   def playing(:cast, {:move, move}, game) do
-    board = Board.move(game.board, move)
-    game = %{game | board: board}
-    update_board(game)
-    case result(game) do
-      :nope ->
-        {:repeat_state, %{game | current_player: opposite_player(game.current_player)}}
+    game = %{game | board: Board.move(game.board, move)}
+    send_board(game)
+    case Board.winner(game.board) do
+      :in_progress ->
+        next_player = opposite_player(game.current_player)
+        {:repeat_state, %{game | current_player: next_player}}
 
       result ->
         notify_result(game, result)
@@ -91,13 +74,11 @@ defmodule Pentago.GameServer do
 
   def playing(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
     lock_board(game, "Waiting for player 1 to reconnect")
-    terminate()
     {:next_state, :waiting, %{game | player1: nil}}
   end
 
   def playing(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
     lock_board(game, "Waiting for player 2 to reconnect")
-    terminate()
     {:next_state, :waiting, %{game | player2: nil}}
   end
 
@@ -107,41 +88,21 @@ defmodule Pentago.GameServer do
     game = Map.put(game, player, pid)
     Process.monitor(pid)
     start_game()
-    reply = {:reply, from, {:ok, {game.board, player_color(player)}}}
-    {:keep_state, game, [reply]}
+    send_board(game)
+    {:keep_state, game, [{:reply, from, {:ok, player_color(player)}}]}
   end
 
-  defp result(%{board: %{winner: winner, moves_history: history}} = game) do
-    cond do
-      winner == :draw ->
-        :draw
+  defp notify_result(game, :draw), do: send_result(game, :draw)
+  defp notify_result(game, :no_winner), do: send_result(game, :no_winner)
 
-      length(history) == 36 and winner == :empty ->
-        :empty
-
-      winner in [:black, :white] ->
-        player(winner)
-
-      true -> :nope
-    end
+  defp notify_result(%{player1: player1, player2: player2} = game, :black) do
+    send_result(player1, :won)
+    send_result(player2, :lost)
   end
 
-  defp notify_result(%{player1: player1, player2: player2} = game, result) do
-    case result do
-      :draw ->
-        send_result(game, :draw)
-
-      :empty ->
-        send_result(game, :empty)
-
-      :player1 ->
-        send_result(player1, :won)
-        send_result(player2, :lost)
-
-      :player2 ->
-        send_result(player1, :lost)
-        send_result(player2, :won)
-    end
+  defp notify_result(%{player1: player1, player2: player2} = game, :white) do
+    send_result(player1, :lost)
+    send_result(player2, :won)
   end
 
   defp player_color(:player1), do: :black
@@ -150,26 +111,10 @@ defmodule Pentago.GameServer do
   defp opposite_player(:player1), do: :player2
   defp opposite_player(:player2), do: :player1
 
-  defp player(:black), do: :player1
-  defp player(:white), do: :player2
-
-  def finished?(%Board{moves_history: history}) when length(history) == 36, do: true
-  def finished?(%Board{winner: :empty}), do: false
-  def finished?(_), do: true
-
-  def winner_message(%Board{winner: marble}, marble), do: "You won!"
-  def winner_message(%Board{winner: :empty}, _), do: "Draw"
-  def winner_message(%Board{winner: :draw}, _), do: "Draw"
-  def winner_message(%Board{winner: _}, _), do: "Second place"
-
   # schedule helpers
 
   defp start_game do
     send(self(), :start_game)
-  end
-
-  defp terminate do
-    send(self(), :terminate)
   end
 
   # updating live view helpers
@@ -182,7 +127,7 @@ defmodule Pentago.GameServer do
     send_live(pid, :make_move)
   end
 
-  defp update_board(%{board: board} = game) do
+  defp send_board(%{board: board} = game) do
     send_live(game, {:board, board})
   end
 
