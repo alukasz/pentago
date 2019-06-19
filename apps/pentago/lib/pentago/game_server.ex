@@ -7,7 +7,6 @@ defmodule Pentago.GameServer do
   alias Pentago.Board
 
   def init(game) do
-    Logger.debug "creating game #{game.id}"
     {:ok, :waiting, game}
   end
 
@@ -30,47 +29,38 @@ defmodule Pentago.GameServer do
   end
 
   def waiting({:call, {pid, _} = from}, :join, game) do
-    Logger.debug("player #{inspect pid} cannot join full game #{game.id}")
     {:keep_state_and_data, [{:reply, from, {:error, :game_full}}]}
   end
 
-  def waiting(:info, :maybe_start_game, %{player1: nil}), do: :keep_state_and_data
-  def waiting(:info, :maybe_start_game, %{player2: nil}), do: :keep_state_and_data
+  def waiting(:info, :start_game, %{player1: nil}), do: :keep_state_and_data
+  def waiting(:info, :start_game, %{player2: nil}), do: :keep_state_and_data
+  def waiting(:info, :start_game, game), do: {:next_state, :playing, game}
 
-  def waiting(:info, :maybe_start_game, game) do
-    Logger.debug "starting game"
-    {:next_state, :playing, game}
-  end
-
-  def waiting(:info, :maybe_terminate, %{player1: nil, player2: nil} = game) do
-    Logger.debug "terminating game #{game.id}"
+  def waiting(:info, :terminate, %{player1: nil, player2: nil} = game) do
     {:stop, :players_disconnected, game}
   end
 
-  def waiting(:info, :maybe_terminate, _game) do
+  def waiting(:info, :terminate, _game) do
     :keep_state_and_data
   end
 
   # handle player disconnecting
 
   def waiting(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
-    Logger.debug "Player 1 #{inspect pid} disconnected"
     lock_board(game, "Waiting for player 1 to reconnect")
-    maybe_terminate()
+    terminate()
     {:keep_state, %{game | player1: nil}}
   end
 
   def waiting(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
-    Logger.debug "Player 2 #{inspect pid} disconnected"
     lock_board(game, "Waiting for player 2 to reconnect")
-    maybe_terminate()
+    terminate()
     {:keep_state, %{game | player2: nil}}
   end
 
   # :playing callbacks
 
   def playing(:enter, _, game) do
-    Logger.debug "enter playing"
     case game.current_player do
       :player1 ->
         lock_board(game.player2, "Player 1 is making move")
@@ -100,26 +90,23 @@ defmodule Pentago.GameServer do
   # handle player disconnecting when playing
 
   def playing(:info, {:DOWN, _, _, pid, _}, %{player1: pid} = game) do
-    Logger.debug "Player 1 #{inspect pid} disconnected"
     lock_board(game, "Waiting for player 1 to reconnect")
-    maybe_terminate()
+    terminate()
     {:next_state, :waiting, %{game | player1: nil}}
   end
 
   def playing(:info, {:DOWN, _, _, pid, _}, %{player2: pid} = game) do
-    Logger.debug "Player 2 #{inspect pid} disconnected"
     lock_board(game, "Waiting for player 2 to reconnect")
-    maybe_terminate()
+    terminate()
     {:next_state, :waiting, %{game | player2: nil}}
   end
 
   # helpers
 
   defp join(game, player, {pid, _} = from) do
-    Logger.debug("#{player} #{inspect pid} is joining game #{game.id}")
     game = Map.put(game, player, pid)
     Process.monitor(pid)
-    maybe_start_game()
+    start_game()
     reply = {:reply, from, {:ok, {game.board, player_color(player)}}}
     {:keep_state, game, [reply]}
   end
@@ -133,7 +120,7 @@ defmodule Pentago.GameServer do
         :empty
 
       winner in [:black, :white] ->
-        winner
+        player(winner)
 
       true -> :nope
     end
@@ -147,11 +134,11 @@ defmodule Pentago.GameServer do
       :empty ->
         send_result(game, :empty)
 
-      :black ->
+      :player1 ->
         send_result(player1, :won)
         send_result(player2, :lost)
 
-      :white ->
+      :player2 ->
         send_result(player1, :lost)
         send_result(player2, :won)
     end
@@ -177,12 +164,12 @@ defmodule Pentago.GameServer do
 
   # schedule helpers
 
-  defp maybe_start_game do
-    send(self(), :maybe_start_game)
+  defp start_game do
+    send(self(), :start_game)
   end
 
-  defp maybe_terminate do
-    send(self(), :maybe_terminate)
+  defp terminate do
+    send(self(), :terminate)
   end
 
   # updating live view helpers

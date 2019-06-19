@@ -3,6 +3,8 @@ defmodule Pentago.Board do
   alias Pentago.Move
   alias Pentago.Game.BitBoard
 
+  require Logger
+
   @algorithm_negamax_ab 1
   @evaluation_in_row_block 1
   @move_generator_sorted 1
@@ -25,7 +27,7 @@ defmodule Pentago.Board do
   end
 
   def generate_move(%Board{} = board, marble, depth \\ 2) do
-    {_, position, _, sub_board, rotation, _, _, _} =
+    {_, position, _, sub_board, rotation, _, time, nodes} =
       BitBoard.make_move(
         to_nif_board(board),
         @algorithm_negamax_ab,
@@ -35,6 +37,7 @@ defmodule Pentago.Board do
         depth,
         length(board.moves_history)
       )
+    Logger.debug("AI visited #{nodes} nodes in #{time}s.")
 
     %Move{
       marble: marble,
