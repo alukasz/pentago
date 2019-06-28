@@ -31,10 +31,14 @@ defmodule Pentago.Web.GameLive do
 
   def handle_event("make_move", sub_board_rotation, socket) do
     %{marble: marble, selected: selected} = socket.assigns
-    move = build_move(marble, selected, sub_board_rotation)
-    Game.move(socket.assigns.game_id, move)
-
-    {:noreply, assign(socket, selected: nil, make_move: false)}
+    case selected do
+      nil ->
+        {:noreply, assign(socket, selected: nil)}
+      _ ->
+        move = build_move(marble, selected, sub_board_rotation)
+        Game.move(socket.assigns.game_id, move)
+        {:noreply, assign(socket, selected: nil, make_move: false)}
+    end
   end
 
   def handle_info({:join, game_id}, socket) do

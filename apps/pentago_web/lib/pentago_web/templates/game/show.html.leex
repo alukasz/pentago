@@ -10,7 +10,7 @@
     end %>
 
     <%= if @make_move and not @result do %>
-      <%= for sub_board <- ["top_left", "top_right", "bottom_left", "bottom_right"], rotation <- ["clockwise", "counter_clockwise"], do: rotate_button(sub_board, rotation) %>
+      <%= for sub_board <- ["top_left", "top_right", "bottom_left", "bottom_right"], rotation <- ["clockwise", "counter_clockwise"], do: rotate_button(sub_board, rotation, @selected) %>
     <% end %>
   </div>
 </div>

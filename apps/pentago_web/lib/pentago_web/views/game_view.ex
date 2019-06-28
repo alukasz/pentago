@@ -51,7 +51,12 @@ defmodule Pentago.Web.GameView do
   defp selected(position, position), do: "marble-selected"
   defp selected(_, _), do: ""
 
-  def rotate_button(sub_board, rotation) do
+  def rotate_button(sub_board, rotation, nil) do
+    class = "rotate rotate-#{sub_board}-#{rotation}"
+    content_tag(:button, nil, class: class)
+  end
+
+  def rotate_button(sub_board, rotation, selected) do
     class = "rotate rotate-#{sub_board}-#{rotation}"
     content_tag(:button, nil, class: class, "phx-click": "make_move", "phx-value": [sub_board, "-", rotation])
   end
