@@ -10,6 +10,7 @@ defmodule Pentago.Mixfile do
      lockfile: "../../mix.lock",
      elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
+     compilers: [:elixir_make] ++ Mix.compilers(),
      start_permanent: Mix.env == :prod,
      aliases: aliases(),
      deps: deps()]
@@ -31,7 +32,9 @@ defmodule Pentago.Mixfile do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    []
+    [
+      {:elixir_make, "~> 0.6", runtime: false}
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

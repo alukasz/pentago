@@ -2,7 +2,9 @@ defmodule Pentago.Game.BitBoard do
   @on_load :load_nifs
 
   def load_nifs do
-    :erlang.load_nif(__DIR__ <> "/../../../priv/libbit_board", 0)
+    :code.priv_dir(:pentago)
+    |> Path.join("libbit_board")
+    |> :erlang.load_nif(0)
   end
 
   def move(_board, _pos, _color, _sub_board, _rotation) do
