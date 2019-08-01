@@ -20,6 +20,7 @@ defmodule Pentago.Web.Router do
     get "/", PageController, :index
 
     resources "/game", GameController, only: [:create, :show]
+    post "/vue", GameController, :create_vue, only: [:vue]
   end
 
   # Other scopes may use custom stacks.

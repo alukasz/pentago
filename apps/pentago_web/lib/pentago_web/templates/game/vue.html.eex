@@ -1,0 +1,3 @@
+<div id="app">
+  <pentago game_id="<%= @game_id %>"></pentago>
+</div>
