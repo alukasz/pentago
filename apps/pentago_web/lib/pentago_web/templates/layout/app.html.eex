@@ -20,7 +20,7 @@
         <%= button "AI medium", to: game_path(@conn, :create, ai: "medium"), class: "btn btn-success" %>
         <%= button "AI hard", to: game_path(@conn, :create, ai: "hard"), class: "btn btn-success" %>
         <%= button "AI impossible", to: game_path(@conn, :create, ai: "impossible"), class: "btn btn-success" %>
-        <%= button "Vue", to: game_path(@conn, :create_vue), class: "btn btn-success" %>
+        <%= button "Vue", to: game_vue_path(@conn, :create), class: "btn btn-success" %>
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>

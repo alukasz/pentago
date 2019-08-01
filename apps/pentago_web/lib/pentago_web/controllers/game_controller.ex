@@ -21,10 +21,4 @@ defmodule Pentago.Web.GameController do
   def show(conn, %{"id" => game_id}) do
     live_render conn, Pentago.Web.GameLive, session: %{game_id: game_id, ai: nil}
   end
-
-  def create_vue(conn, _params) do
-    {:ok, %Game{id: id}} = Game.create()
-
-    render conn, "vue.html", game_id: id
-  end
 end
