@@ -9,7 +9,7 @@ defmodule Pentago.Game do
     :player1,
     :player2,
     current_player: :player1,
-    board: %Board{},
+    board: %Board{}
   ]
 
   def start_link(%Game{} = game) do

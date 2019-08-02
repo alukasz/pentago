@@ -8,13 +8,42 @@ defmodule Pentago.BoardTest do
     setup do
       board = %Board{
         marbles: [
-          :black, :white, :empty, :black, :white, :empty,
-          :white, :empty, :black, :white, :empty, :black,
-          :empty, :black, :white, :empty, :black, :white,
-
-          :black, :white, :empty, :black, :white, :empty,
-          :white, :empty, :black, :white, :empty, :black,
-          :empty, :black, :white, :empty, :black, :white
+          :black,
+          :white,
+          :empty,
+          :black,
+          :white,
+          :empty,
+          :white,
+          :empty,
+          :black,
+          :white,
+          :empty,
+          :black,
+          :empty,
+          :black,
+          :white,
+          :empty,
+          :black,
+          :white,
+          :black,
+          :white,
+          :empty,
+          :black,
+          :white,
+          :empty,
+          :white,
+          :empty,
+          :black,
+          :white,
+          :empty,
+          :black,
+          :empty,
+          :black,
+          :white,
+          :empty,
+          :black,
+          :white
         ]
       }
 
@@ -38,7 +67,6 @@ defmodule Pentago.BoardTest do
 
       assert elem(new_board, 0) == :white
     end
-
 
     test "updates board white 20", %{board: board} do
       board = %{board | marbles: List.replace_at(board.marbles, 20, :empty)}

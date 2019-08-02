@@ -25,9 +25,7 @@ defmodule Pentago.Web.ChannelCase do
     end
   end
 
-
   setup _tags do
     :ok
   end
-
 end

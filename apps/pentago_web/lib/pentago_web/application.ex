@@ -7,7 +7,7 @@ defmodule Pentago.Web.Application do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      supervisor(Pentago.Web.Endpoint, []),
+      supervisor(Pentago.Web.Endpoint, [])
       # Start your own worker by calling: Pentago.Web.Worker.start_link(arg1, arg2, arg3)
       # worker(Pentago.Web.Worker, [arg1, arg2, arg3]),
     ]

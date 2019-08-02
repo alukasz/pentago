@@ -31,9 +31,11 @@ defmodule Pentago.Web.GameLive do
 
   def handle_event("make_move", sub_board_rotation, socket) do
     %{marble: marble, selected: selected} = socket.assigns
+
     case selected do
       nil ->
         {:noreply, assign(socket, selected: nil)}
+
       _ ->
         move = build_move(marble, selected, sub_board_rotation)
         Game.move(socket.assigns.game_id, move)
@@ -44,7 +46,9 @@ defmodule Pentago.Web.GameLive do
   def handle_info({:join, game_id}, socket) do
     case Game.join(game_id) do
       {:ok, marble} ->
-        {:noreply, assign(socket, game_id: game_id, marble: marble, lock: "Waiting for other player")}
+        {:noreply,
+         assign(socket, game_id: game_id, marble: marble, lock: "Waiting for other player")}
+
       {:error, reason} ->
         {:noreply, assign(socket, :lock, reason)}
     end
@@ -55,7 +59,7 @@ defmodule Pentago.Web.GameLive do
   end
 
   def handle_info({:start_ai, ai}, socket) do
-    {:ok, _} = Pentago.AIPlayer.start_link([game_id: socket.assigns.game_id, ai: ai])
+    {:ok, _} = Pentago.AIPlayer.start_link(game_id: socket.assigns.game_id, ai: ai)
     {:noreply, socket}
   end
 
@@ -77,6 +81,7 @@ defmodule Pentago.Web.GameLive do
 
   defp build_move(marble, position, sub_board_rotation) do
     [sub_board, rotation] = String.split(sub_board_rotation, "-")
+
     %Pentago.Move{
       marble: marble,
       position: position,

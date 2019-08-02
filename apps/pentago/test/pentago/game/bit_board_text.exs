@@ -11,13 +11,42 @@ defmodule Pentago.Game.BitBoardTest do
   describe "BitBoard.move/5" do
     setup do
       board = {
-        @black, @white, @empty, @black, @white, @empty,
-        @white, @empty, @black, @white, @empty, @black,
-        @empty, @black, @white, @empty, @black, @white,
-
-        @black, @white, @empty, @black, @white, @empty,
-        @white, @empty, @black, @white, @empty, @black,
-        @empty, @black, @white, @empty, @black, @white
+        @black,
+        @white,
+        @empty,
+        @black,
+        @white,
+        @empty,
+        @white,
+        @empty,
+        @black,
+        @white,
+        @empty,
+        @black,
+        @empty,
+        @black,
+        @white,
+        @empty,
+        @black,
+        @white,
+        @black,
+        @white,
+        @empty,
+        @black,
+        @white,
+        @empty,
+        @white,
+        @empty,
+        @black,
+        @white,
+        @empty,
+        @black,
+        @empty,
+        @black,
+        @white,
+        @empty,
+        @black,
+        @white
       }
 
       {:ok, board: board}
@@ -40,7 +69,6 @@ defmodule Pentago.Game.BitBoardTest do
 
       assert elem(new_board, 0) == @white
     end
-
 
     test "updates board white 20", %{board: board} do
       move = {20, @white, 0, @clockwise}

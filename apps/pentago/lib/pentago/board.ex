@@ -22,8 +22,12 @@ defmodule Pentago.Board do
         rotation(move.rotation)
       )
 
-    %Board{board | marbles: from_nif_board(new_nif_board), winner: color(winner),
-           moves_history: [move | board.moves_history]}
+    %Board{
+      board
+      | marbles: from_nif_board(new_nif_board),
+        winner: color(winner),
+        moves_history: [move | board.moves_history]
+    }
   end
 
   def generate_move(%Board{} = board, marble, depth \\ 2) do
@@ -37,6 +41,7 @@ defmodule Pentago.Board do
         depth,
         length(board.moves_history)
       )
+
     Logger.debug("AI visited #{nodes} nodes in #{time}s.")
 
     %Move{
@@ -58,7 +63,8 @@ defmodule Pentago.Board do
       winner in [:black, :white] ->
         winner
 
-      true -> :in_progress
+      true ->
+        :in_progress
     end
   end
 

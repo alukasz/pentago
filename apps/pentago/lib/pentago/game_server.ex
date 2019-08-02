@@ -69,6 +69,7 @@ defmodule Pentago.GameServer do
   def playing(:cast, {:move, move, _player_pid}, game) do
     game = %{game | board: Board.move(game.board, move)}
     send_board(game)
+
     case Board.winner(game.board) do
       :in_progress ->
         next_player = opposite_player(game.current_player)

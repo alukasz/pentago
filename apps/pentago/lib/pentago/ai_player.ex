@@ -25,6 +25,7 @@ defmodule Pentago.AIPlayer do
     case Game.join(game_id) do
       {:ok, marble} ->
         {:noreply, %{state | marble: marble}}
+
       {:error, _reason} ->
         {:stop, :failed_to_join, state}
     end

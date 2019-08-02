@@ -16,7 +16,7 @@ defmodule Pentago.Web.GameView do
 
   def lock_board(message) do
     content_tag :div, class: "lock" do
-      content_tag :p, message
+      content_tag(:p, message)
     end
   end
 
@@ -35,6 +35,7 @@ defmodule Pentago.Web.GameView do
 
   defp marble({marble, position}, selected) when marble in [:black, :white, :empty] do
     class = Enum.join(["marble", color(marble), selected(position, selected)], " ")
+
     action =
       case marble do
         :empty -> ["phx-click": "select_marble", "phx-value": position]
@@ -58,6 +59,11 @@ defmodule Pentago.Web.GameView do
 
   def rotate_button(sub_board, rotation, _selected) do
     class = "rotate rotate-#{sub_board}-#{rotation}"
-    content_tag(:button, nil, class: class, "phx-click": "make_move", "phx-value": [sub_board, "-", rotation])
+
+    content_tag(:button, nil,
+      class: class,
+      "phx-click": "make_move",
+      "phx-value": [sub_board, "-", rotation]
+    )
   end
 end
