@@ -25,7 +25,7 @@ defmodule Pentago.AIPlayer do
     case Game.join(game_id) do
       {:ok, marble} ->
         {:noreply, %{state | marble: marble}}
-      {:error, reason} ->
+      {:error, _reason} ->
         {:stop, :failed_to_join, state}
     end
   end
@@ -36,7 +36,7 @@ defmodule Pentago.AIPlayer do
 
   def handle_info(:make_move, state) do
     %{game_id: game_id, depth: depth, marble: marble, board: board} = state
-    move = Board.generate_move(state.board, state.marble, state.depth)
+    move = Board.generate_move(board, marble, depth)
     Game.move(game_id, move)
 
     {:noreply, state}

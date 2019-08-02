@@ -46,7 +46,7 @@ defmodule Pentago.Game do
   end
 
   def move(game, %Move{} = move) do
-    :gen_statem.cast(name(game), {:move, move})
+    :gen_statem.cast(name(game), {:move, move, self()})
   end
 
   defp name(%Game{id: id}), do: name(id)

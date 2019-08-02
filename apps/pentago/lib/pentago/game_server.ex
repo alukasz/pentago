@@ -52,11 +52,21 @@ defmodule Pentago.GameServer do
     :keep_state_and_data
   end
 
-  def playing({:call, from}, :join, game) do
+  def playing({:call, from}, :join, _game) do
     {:keep_state_and_data, [{:reply, from, {:error, "Game full"}}]}
   end
 
-  def playing(:cast, {:move, move}, game) do
+  # block player1 tampering with game and making move in player2 turn
+  def playing(:cast, {:move, _, player}, %{current_player: :player2, player1: player}) do
+    :keep_state_and_data
+  end
+
+  # block player2 tampering with game and making move in player1 turn
+  def playing(:cast, {:move, _, player}, %{current_player: :player1, player2: player}) do
+    :keep_state_and_data
+  end
+
+  def playing(:cast, {:move, move, _player_pid}, game) do
     game = %{game | board: Board.move(game.board, move)}
     send_board(game)
     case Board.winner(game.board) do
@@ -95,12 +105,12 @@ defmodule Pentago.GameServer do
   defp notify_result(game, :draw), do: send_result(game, :draw)
   defp notify_result(game, :no_winner), do: send_result(game, :no_winner)
 
-  defp notify_result(%{player1: player1, player2: player2} = game, :black) do
+  defp notify_result(%{player1: player1, player2: player2}, :black) do
     send_result(player1, :won)
     send_result(player2, :lost)
   end
 
-  defp notify_result(%{player1: player1, player2: player2} = game, :white) do
+  defp notify_result(%{player1: player1, player2: player2}, :white) do
     send_result(player1, :lost)
     send_result(player2, :won)
   end
