@@ -119,6 +119,7 @@
             },
             makeMove(sub_board, rotation) {
                 if (this.selected === null) {
+                    alert("Please select position to place marble");
                     return;
                 }
                 this.channel.push("make_move", {
