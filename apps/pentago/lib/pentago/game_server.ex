@@ -56,7 +56,17 @@ defmodule Pentago.GameServer do
     {:keep_state_and_data, [{:reply, from, {:error, "Game full"}}]}
   end
 
-  def playing(:cast, {:move, move}, game) do
+  # block player1 tampering with game and making move in player2 turn
+  def playing(:cast, {:move, _, player}, %{current_player: :player2, player1: player} = game) do
+    :keep_state_and_data
+  end
+
+  # block player2 tampering with game and making move in player1 turn
+  def playing(:cast, {:move, _, player}, %{current_player: :player1, player2: player} = game) do
+    :keep_state_and_data
+  end
+
+  def playing(:cast, {:move, move, player_pid}, game) do
     game = %{game | board: Board.move(game.board, move)}
     send_board(game)
     case Board.winner(game.board) do
